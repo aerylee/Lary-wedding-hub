@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply antialiased; font-feature-settings: 'cv11', 'ss01'; }
+  :focus-visible { outline-color: theme('colors.amber.500'); }
+  input[type='date'], input[type='time'] { min-height: 2.375rem; }
+  .dark { color-scheme: dark; }
+}
