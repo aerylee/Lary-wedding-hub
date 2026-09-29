@@ -5,5 +5,5 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
-  test: { globals: true, environment: 'node', include: ['src/**/*.test.ts'] },
+  test: { globals: true, environment: 'node', include: ['src/**/*.test.ts', 'supabase/functions/_shared/*.test.ts'] },
 });

@@ -122,7 +122,7 @@ function payloadOf(row: Row): Record<string, unknown> {
 const StoreCtx = createContext<StoreValue | null>(null);
 
 export function StoreProvider({ weddingId, children }: { weddingId: string; children: ReactNode }) {
-  const { can, permissions, permissionsLoaded } = useAuth();
+  const { permissions, permissionsLoaded } = useAuth();
   const toast = useToast();
   const [data, setData] = useState<Data>(emptyData);
   const [settings, setSettings] = useState<WeddingSettings>({ ...DEFAULT_SETTINGS, wedding_id: weddingId });
@@ -461,8 +461,6 @@ export function StoreProvider({ weddingId, children }: { weddingId: string; chil
     [ready, loadError, weddingId, settings, saveSettings, data, put, putMany, remove, error, members, activity, reloadMembers, files, team, invoke],
   );
 
-  // can() is referenced so the provider re-renders when permissions change
-  void can;
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;
 }
 
