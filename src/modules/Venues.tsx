@@ -75,7 +75,7 @@ export default function Venues() {
             </label>
           }
         >
-          <strong>Nothing chosen yet.</strong> Score them and pick one{decideIn !== null && decideIn >= 0 ? ` — ${decideIn} days until your decide-by date` : decideIn !== null ? ' — your decide-by date has passed' : ''}.
+          <strong>Nothing chosen yet.</strong> Score them and pick one{decideIn !== null && decideIn >= 0 ? ` — your decide-by date is ${relativeDays(decideIn)}` : decideIn !== null ? ' — your decide-by date has passed' : ''}.
           When one is holding your dates, mark it held.
         </Banner>
       )}

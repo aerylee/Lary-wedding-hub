@@ -104,7 +104,7 @@ export default function RunOfShow() {
                   <span className={cls('absolute -left-[7px] top-4 h-3 w-3 rounded-full border-2 border-white dark:border-stone-900', clashIds.has(i.id) ? 'bg-rose-500' : 'bg-amber-600')} />
                   <button onClick={() => ed.open(i)} className="block w-full rounded-lg px-3 py-2 text-left hover:bg-stone-50 dark:hover:bg-stone-800/50">
                     <div className="flex flex-wrap items-baseline gap-x-3">
-                      <span className="w-24 shrink-0 text-sm font-semibold tabular-nums">{fmtTime(i.time)}–{end(i)}</span>
+                      <span className="w-28 shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums">{fmtTime(i.time)}–{end(i)}</span>
                       <span className="text-sm font-medium">{i.title}</span>
                       <Pill tone={KIND_TONE[i.kind]}>{KIND_LABEL[i.kind]}</Pill>
                       {clashIds.has(i.id) && <Pill tone="bad"><IconAlert size={11} /> clash</Pill>}

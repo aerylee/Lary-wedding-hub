@@ -75,7 +75,7 @@ export default function Dashboard() {
           {settings.decide_venue_by
             ? decideIn! < 0
               ? `The decide-by date (${fmtDate(settings.decide_venue_by)}) has passed.`
-              : `You planned to decide by ${fmtDate(settings.decide_venue_by)} — ${decideIn} days from now.`
+              : `You planned to decide by ${fmtDate(settings.decide_venue_by)} — ${relativeDays(decideIn)}.`
             : 'Set a decide-by date on the Venues page.'}
         </Banner>
       )}

@@ -29,7 +29,7 @@ const TONE_PILL: Record<Tone, string> = {
 // ─── layout ──────────────────────────────────────────────────────────────────
 export function Panel({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
   return (
-    <section id={id} className={cls('rounded-xl border border-stone-200 bg-white shadow-sm dark:border-stone-800 dark:bg-stone-900', className)}>
+    <section id={id} className={cls('min-w-0 rounded-xl border border-stone-200 bg-white shadow-sm dark:border-stone-800 dark:bg-stone-900', className)}>
       {children}
     </section>
   );
@@ -142,8 +142,11 @@ export function IconButton({ label, children, className, ...rest }: ButtonHTMLAt
 }
 
 // ─── form fields ─────────────────────────────────────────────────────────────
+// a caller-supplied width (w-40, max-w-xs…) replaces the default full width
+const width = (className?: string) => (className && /(^|\s)w-/.test(className) ? '' : 'w-full');
+
 const INPUT =
-  'w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 disabled:bg-stone-50 disabled:text-stone-500 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100 dark:disabled:bg-stone-900';
+  'rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 disabled:bg-stone-50 disabled:text-stone-500 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100 dark:disabled:bg-stone-900';
 
 export function Field({ label, hint, children, className, htmlFor }: { label: ReactNode; hint?: ReactNode; children: ReactNode; className?: string; htmlFor?: string }) {
   return (
@@ -156,16 +159,16 @@ export function Field({ label, hint, children, className, htmlFor }: { label: Re
 }
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...rest }, ref) {
-  return <input ref={ref} className={cls(INPUT, className)} {...rest} />;
+  return <input ref={ref} className={cls(INPUT, width(className), className)} {...rest} />;
 });
 
 export const Area = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Area({ className, rows = 3, ...rest }, ref) {
-  return <textarea ref={ref} rows={rows} className={cls(INPUT, 'resize-y', className)} {...rest} />;
+  return <textarea ref={ref} rows={rows} className={cls(INPUT, width(className), 'resize-y', className)} {...rest} />;
 });
 
 export function Select({ className, children, ...rest }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select className={cls(INPUT, 'pr-8', className)} {...rest}>
+    <select className={cls(INPUT, width(className), 'pr-8', className)} {...rest}>
       {children}
     </select>
   );
@@ -185,7 +188,7 @@ export function Money({
         step="any"
         disabled={disabled}
         placeholder={placeholder}
-        className={cls(INPUT, 'pl-7 tabular-nums')}
+        className={cls(INPUT, 'w-full pl-7 tabular-nums')}
         value={value === null || value === undefined ? '' : String(value)}
         onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
       />
