@@ -12,6 +12,7 @@ import {
   IconChat, IconChevronDown, IconChevronLeft, IconChevronRight, IconHeart, IconLock, IconMenu, IconMessage, IconMessagePlus, IconMoon, IconSun, IconX,
 } from '@/components/icons';
 import { CommentLayer, CommentSidebar, useCommentUi } from '@/components/comments/CommentLayer';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useTheme } from '@/components/theme';
 import { TABS, TAB_BY_KEY } from '@/modules/registry';
 import { FullScreen, Splash } from './Guards';
@@ -169,6 +170,7 @@ function Shell() {
           ) : !ready ? (
             <div className="py-16"><Spinner label="Loading the plan…" /></div>
           ) : (
+            <ErrorBoundary resetKey={loc.pathname}>
             <Suspense fallback={<div className="py-16"><Spinner /></div>}>
               <Routes>
                 <Route index element={<Navigate to="dashboard" replace />} />
@@ -178,6 +180,7 @@ function Shell() {
                 <Route path=":tab" element={<TabRoute />} />
               </Routes>
             </Suspense>
+            </ErrorBoundary>
           )}
         </main>
 

@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/react';
 import './index.css';
 import { AuthProvider } from '@/lib/auth';
 import { ToastProvider } from '@/components/toast';
+import { ConfirmProvider } from '@/components/Confirm';
 import { AuthScreen } from '@/routes/AuthScreen';
 import { Join } from '@/routes/Join';
 import { Onboarding } from '@/routes/Onboarding';
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ToastProvider>
+        <ConfirmProvider>
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<AuthScreen />} />
@@ -27,6 +29,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthProvider>
+        </ConfirmProvider>
       </ToastProvider>
     </BrowserRouter>
     <Analytics />

@@ -2,6 +2,7 @@
 // counts. Anyone who can read the chat sees every channel; organising channels is
 // chat:manage. Messages arrive live.
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
@@ -10,6 +11,7 @@ import type { ChatCategory, ChatChannel, ChatMessage } from '@/lib/types';
 import { cls, fmtDate, timeAgo } from '@/lib/util';
 import { Button, Empty, Field, IconButton, Input, Modal, Select, Spinner } from '@/components/kit';
 import { whyNot } from '@/components/Gate';
+import { useConfirm } from '@/components/Confirm';
 import {
   IconArchive, IconArrowDown, IconArrowUp, IconChevronDown, IconChevronLeft, IconChevronRight, IconFolder, IconHash, IconMore,
   IconPencil, IconPin, IconPlus, IconReply, IconTrash, IconX,
@@ -105,6 +107,7 @@ function ChannelList({ channels, categories, currentId, unread, onOpen, onEditCh
   const { weddingId } = useStore();
   const { can } = useAuth();
   const { reorder, saveChannel, deleteCategory, deleteChannel } = useCollab();
+  const confirm = useConfirm();
   const manage = can('chat:manage');
   const [folded, setFolded] = useState<Set<string>>(() => new Set(JSON.parse(store.get(FOLD_KEY(weddingId)) ?? '[]') as string[]));
   const [showArchived, setShowArchived] = useState(false);
@@ -166,7 +169,10 @@ function ChannelList({ channels, categories, currentId, unread, onOpen, onEditCh
                   <MenuItem
                     icon={<IconTrash size={13} />}
                     danger
-                    onClick={() => window.confirm(`Delete the “${cat.name}” category? Its channels and their messages stay, uncategorised.`) && deleteCategory(cat.id).catch(() => undefined)}
+                    onClick={async () => {
+                      if (await confirm({ title: `Delete the “${cat.name}” category?`, body: 'Its channels and their messages stay, listed under “Other channels”.' }))
+                        deleteCategory(cat.id).catch(() => undefined);
+                    }}
                   >
                     Delete category
                   </MenuItem>
@@ -253,7 +259,10 @@ function ChannelList({ channels, categories, currentId, unread, onOpen, onEditCh
                           <MenuItem
                             icon={<IconTrash size={13} />}
                             danger
-                            onClick={() => window.confirm(`Delete #${c.name} and every message in it? This can't be undone.`) && deleteChannel(c.id).catch(() => undefined)}
+                            onClick={async () => {
+                              if (await confirm({ title: `Delete #${c.name}?`, body: 'Every message in it goes too. This can’t be undone.', confirmLabel: 'Delete channel' }))
+                                deleteChannel(c.id).catch(() => undefined);
+                            }}
                           >
                             Delete forever
                           </MenuItem>
@@ -348,7 +357,7 @@ function ChannelView({ channel, onBack, onEdit }: { channel: ChatChannel; onBack
   const openThread = thread ? list.find((m) => m.id === thread) ?? null : null;
 
   return (
-    <div className="flex h-full min-h-0">
+    <div className="relative flex h-full min-h-0">
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-12 shrink-0 items-center gap-2 border-b border-stone-200 px-3 dark:border-stone-800">
           <IconButton label="All channels" className="md:hidden" onClick={onBack}><IconChevronLeft size={18} /></IconButton>
@@ -436,7 +445,7 @@ function ChannelView({ channel, onBack, onEdit }: { channel: ChatChannel; onBack
       </div>
 
       {openThread && (
-        <ThreadPane parent={openThread} replies={replies.get(openThread.id) ?? []} people={people} canPost={canPost} onClose={() => setThread(null)} />
+        <ThreadPane parent={openThread} channelName={channel.name} replies={replies.get(openThread.id) ?? []} people={people} canPost={canPost} onClose={() => setThread(null)} />
       )}
     </div>
   );
@@ -456,10 +465,13 @@ function DayDivider({ iso }: { iso: string }) {
   );
 }
 
-function MessageRow({ m, compact, replies, people, onThread, highlight, inThread }: {
+function MessageRow({ m, compact, replies, people, onThread, highlight, inThread, threadSize = replies.length }: {
   m: ChatMessage; compact: boolean; replies: ChatMessage[]; people: Person[]; onThread?: () => void; highlight?: boolean; inThread?: boolean;
+  /** replies that go with this message if it's deleted (the thread pane passes them in) */
+  threadSize?: number;
 }) {
   const { editMessage, deleteMessage, setPinned } = useCollab();
+  const confirm = useConfirm();
   const { session, can } = useAuth();
   const everyone = usePeople();
   const [editing, setEditing] = useState(false);
@@ -530,7 +542,16 @@ function MessageRow({ m, compact, replies, people, onThread, highlight, inThread
           )}
           {mine && <IconButton label="Edit" className="h-7 w-7" onClick={() => { setText(m.body); setEditing(true); }}><IconPencil size={13} /></IconButton>}
           {(mine || can('chat:manage')) && (
-            <IconButton label="Delete" className="h-7 w-7" onClick={() => window.confirm(replies.length ? 'Delete this message and its thread?' : 'Delete this message?') && deleteMessage(m.id).catch(() => undefined)}>
+            <IconButton label="Delete" className="h-7 w-7" onClick={async () => {
+              const ok = await confirm(
+                m.parent_id
+                  ? { title: 'Delete this reply?', body: 'This can’t be undone.' }
+                  : threadSize
+                    ? { title: 'Delete this message and its thread?', body: `Its ${threadSize} ${threadSize === 1 ? 'reply goes' : 'replies go'} too. This can’t be undone.` }
+                    : { title: 'Delete this message?', body: 'This can’t be undone.' },
+              );
+              if (ok) deleteMessage(m.id).catch(() => undefined);
+            }}>
               <IconTrash size={13} />
             </IconButton>
           )}
@@ -540,7 +561,9 @@ function MessageRow({ m, compact, replies, people, onThread, highlight, inThread
   );
 }
 
-function ThreadPane({ parent, replies, people, canPost, onClose }: { parent: ChatMessage; replies: ChatMessage[]; people: Person[]; canPost: boolean; onClose: () => void }) {
+function ThreadPane({ parent, channelName, replies, people, canPost, onClose }: {
+  parent: ChatMessage; channelName: string; replies: ChatMessage[]; people: Person[]; canPost: boolean; onClose: () => void;
+}) {
   const { send } = useCollab();
   const [draft, setDraft] = useState('');
   const end = useRef<HTMLDivElement>(null);
@@ -557,15 +580,20 @@ function ThreadPane({ parent, replies, people, canPost, onClose }: { parent: Cha
     }
   };
   return (
-    <aside className="fixed inset-0 z-40 flex flex-col bg-white dark:bg-stone-900 lg:static lg:z-auto lg:w-80 lg:shrink-0 lg:border-l lg:border-stone-200 lg:dark:border-stone-800" aria-label="Thread">
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-stone-200 px-3 dark:border-stone-800">
+    // wide screens: a column beside the conversation. Narrower: it takes over the
+    // conversation area only — the app's navigation and header stay put.
+    <aside className="absolute inset-0 z-20 flex flex-col bg-white dark:bg-stone-900 lg:static lg:z-auto lg:w-80 lg:shrink-0 lg:border-l lg:border-stone-200 lg:dark:border-stone-800" aria-label="Thread">
+      <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-stone-200 px-3 dark:border-stone-800">
+        <button onClick={onClose} className="-ml-1 inline-flex items-center gap-1 rounded-md px-1 py-1 text-sm text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800 lg:hidden">
+          <IconChevronLeft size={16} /> #{channelName}
+        </button>
         <span className="font-semibold">Thread</span>
         <IconButton label="Close thread" onClick={onClose}><IconX size={16} /></IconButton>
       </header>
       <div className="flex-1 overflow-y-auto py-2">
-        <MessageRow m={parent} compact={false} replies={[]} people={people} inThread />
+        <MessageRow m={parent} compact={false} replies={[]} threadSize={sorted.length} people={people} inThread />
         <div className="my-2 flex items-center gap-2 px-4 text-xs text-stone-400">
-          {sorted.length} {sorted.length === 1 ? 'reply' : 'replies'}
+          {sorted.length ? `${sorted.length} ${sorted.length === 1 ? 'reply' : 'replies'}` : 'No replies yet'}
           <div className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
         </div>
         {sorted.map((m, i) => {
@@ -680,31 +708,77 @@ function CategoryEditor({ category, onClose }: { category: Partial<ChatCategory>
 }
 
 // ─── a tiny menu ─────────────────────────────────────────────────────────────
+// Rendered in a portal at fixed coordinates: inside the channel list it would be
+// clipped by the scrolling sidebar and painted under the rows that follow it.
+const MENU_W = 208;
+
 function Menu({ label, icon, children }: { label: string; icon?: ReactNode; children: ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [at, setAt] = useState<{ top: number; left: number } | null>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+
+  const place = () => {
+    const r = button.current?.getBoundingClientRect();
+    if (!r) return;
+    const left = Math.max(8, Math.min(r.right - MENU_W, window.innerWidth - MENU_W - 8));
+    const h = menu.current?.offsetHeight ?? 0;
+    const below = r.bottom + 4;
+    setAt({ left, top: h && below + h > window.innerHeight - 8 ? Math.max(8, r.top - h - 4) : below });
+  };
+
+  useLayoutEffect(() => {
+    if (at) place();
+    // measure once the menu has a height, then flip above the button if it won't fit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!at]);
+
   useEffect(() => {
-    if (!open) return;
-    const close = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    if (!at) return;
+    const close = (e: Event) => {
+      const t = e.target as Node;
+      if (!menu.current?.contains(t) && !button.current?.contains(t)) setAt(null);
+    };
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setAt(null);
+    const dismiss = () => setAt(null);
     document.addEventListener('mousedown', close);
     document.addEventListener('keydown', esc);
+    window.addEventListener('resize', dismiss);
+    window.addEventListener('scroll', dismiss, true);
     return () => {
       document.removeEventListener('mousedown', close);
       document.removeEventListener('keydown', esc);
+      window.removeEventListener('resize', dismiss);
+      window.removeEventListener('scroll', dismiss, true);
     };
-  }, [open]);
+  }, [at]);
+
   return (
-    <div className="relative" ref={ref}>
-      <IconButton label={label} className="h-6 w-6" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+    <>
+      <IconButton
+        ref={button}
+        label={label}
+        className={cls('h-6 w-6', at && 'bg-stone-200 text-stone-900 dark:bg-stone-800 dark:text-stone-100')}
+        aria-haspopup="menu"
+        aria-expanded={!!at}
+        onClick={() => (at ? setAt(null) : (setAt({ top: -9999, left: -9999 }), requestAnimationFrame(place)))}
+      >
         {icon ?? <IconMore size={14} />}
       </IconButton>
-      {open && (
-        <div role="menu" className="absolute right-0 z-50 mt-1 w-52 overflow-hidden rounded-lg border border-stone-200 bg-white py-1 text-sm shadow-lg dark:border-stone-700 dark:bg-stone-900" onClick={() => setOpen(false)}>
-          {children}
-        </div>
-      )}
-    </div>
+      {at &&
+        createPortal(
+          <div
+            ref={menu}
+            role="menu"
+            aria-label={label}
+            style={{ top: at.top, left: at.left, width: MENU_W }}
+            className="fixed z-[60] overflow-hidden rounded-lg border border-stone-200 bg-white py-1 text-sm text-stone-800 shadow-xl dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+            onClick={() => setAt(null)}
+          >
+            {children}
+          </div>,
+          document.body,
+        )}
+    </>
   );
 }
 

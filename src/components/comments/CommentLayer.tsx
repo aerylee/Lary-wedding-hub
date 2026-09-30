@@ -17,6 +17,7 @@ import { TAB_BY_KEY } from '@/modules/registry';
 import { Button, IconButton, Segmented } from '@/components/kit';
 import { IconAt, IconCheck, IconMessage, IconPencil, IconRefresh, IconTrash, IconX } from '@/components/icons';
 import { Avatar, MentionInput, RichText, extractMentions, type Person } from '@/components/MentionInput';
+import { useConfirm } from '@/components/Confirm';
 import { computeAnchor, describe, pinTarget, resolveAnchor } from './anchor';
 
 type Ui = {
@@ -452,6 +453,7 @@ function Thread({ thread, onClose }: { thread: Comment; onClose: () => void }) {
 function CommentItem({ c, people }: { c: Comment; people: Person[] }) {
   const { editComment, deleteComment } = useCollab();
   const { session, can } = useAuth();
+  const confirm = useConfirm();
   const everyone = usePeople();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(c.body);
@@ -467,7 +469,14 @@ function CommentItem({ c, people }: { c: Comment; people: Person[] }) {
           <span className="ml-auto flex opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
             {mine && !editing && <IconButton label="Edit" className="h-6 w-6" onClick={() => { setText(c.body); setEditing(true); }}><IconPencil size={12} /></IconButton>}
             {(mine || can('members:manage')) && (
-              <IconButton label="Delete" className="h-6 w-6" onClick={() => window.confirm(c.parent_id ? 'Delete this reply?' : 'Delete this comment and its replies?') && deleteComment(c.id).catch(() => undefined)}>
+              <IconButton
+                label="Delete"
+                className="h-6 w-6"
+                onClick={async () => {
+                  const ok = await confirm(c.parent_id ? { title: 'Delete this reply?' } : { title: 'Delete this comment?', body: 'Its replies go too.' });
+                  if (ok) deleteComment(c.id).catch(() => undefined);
+                }}
+              >
                 <IconTrash size={12} />
               </IconButton>
             )}
