@@ -83,7 +83,7 @@ export default function Travel() {
                   const urgent = r.status === 'held' && d !== null && d < 30;
                   const people = assigned.get(r.id) ?? [];
                   return (
-                    <TR key={r.id} onClick={() => ed.open(r)} className={cls(r.status === 'released' && 'opacity-50')}>
+                    <TR key={r.id} commentKey={r.id} onClick={() => ed.open(r)} className={cls(r.status === 'released' && 'opacity-50')}>
                       <TD>{r.property}</TD>
                       <TD className="font-medium">{r.name}<div className="text-xs font-normal text-stone-500">{r.type}</div></TD>
                       <TD align="right">{r.beds}</TD>

@@ -31,6 +31,14 @@ export type Correspondence = Tables<'correspondence'>;
 export type Attachment = Tables<'attachments'>;
 export type Faq = Tables<'faqs'>;
 
+export type WeddingRolePermission = Tables<'wedding_role_permissions'>;
+export type Comment = Tables<'comments'>;
+export type Mention = Tables<'mentions'>;
+export type ChatCategory = Tables<'chat_categories'>;
+export type ChatChannel = Tables<'chat_channels'>;
+export type ChatMessage = Tables<'chat_messages'>;
+export type ChatRead = Tables<'chat_reads'>;
+
 export type VenueStatus = Enums<'venue_status'>;
 export type TaskStatus = Enums<'task_status'>;
 export type VendorStatus = Enums<'vendor_status'>;
@@ -89,6 +97,8 @@ export type Permission =
   | 'decisions:read' | 'decisions:write'
   | 'files:read' | 'files:write'
   | 'assistant:use' | 'assistant:apply'
+  | 'comments:write'
+  | 'chat:read' | 'chat:write' | 'chat:manage'
   | 'members:manage' | 'wedding:delete';
 
 /** Which permission reads each collection — mirrors app.table_perms in the database. */

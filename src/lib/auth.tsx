@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [weddingId, setWeddingId] = useState<string | null>(null);
   const [permissions, setPermissions] = useState<Set<string>>(new Set());
   const [permissionsLoaded, setPermissionsLoaded] = useState(false);
+  const [permTick, setPermTick] = useState(0);
   const uid = session?.user.id ?? null;
   const uidRef = useRef(uid);
   uidRef.current = uid;
@@ -105,14 +106,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const membershipKey = memberships.map((m) => `${m.wedding_id}:${m.role}`).join(',');
   useEffect(() => {
     let cancelled = false;
-    setPermissionsLoaded(false);
+    if (permTick === 0) setPermissionsLoaded(false);
     if (!uid || !weddingId) {
       setPermissions(new Set());
       return;
     }
     supabase.rpc('my_permissions', { w: weddingId }).then(({ data }) => {
       if (cancelled) return;
-      setPermissions(new Set(data ?? []));
+      setPermissions((prev) => {
+        const next = new Set<string>(data ?? []);
+        // keep the same object when nothing changed, so the store doesn't reload
+        return prev.size === next.size && [...next].every((p) => prev.has(p)) ? prev : next;
+      });
       setPermissionsLoaded(true);
     });
     try {
@@ -123,7 +128,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [uid, weddingId, membershipKey]);
+  }, [uid, weddingId, membershipKey, permTick]);
+
+  // an owner editing the role matrix changes what everyone can do, straight away
+  useEffect(() => {
+    if (!uid || !weddingId) return;
+    setPermTick(0);
+    const ch = supabase
+      .channel(`role-perms:${weddingId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wedding_role_permissions', filter: `wedding_id=eq.${weddingId}` }, () => {
+        setPermTick((t) => t + 1);
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [uid, weddingId]);
 
   const current = memberships.find((m) => m.wedding_id === weddingId) ?? null;
 
@@ -176,7 +196,7 @@ export const ROLE_LABEL: Record<AppRole, string> = {
 
 export const ROLE_BLURB: Record<AppRole, string> = {
   owner: 'Everything, including the team and deleting the wedding.',
-  planner: 'Everything operational, including money. Cannot manage the team.',
-  collaborator: 'Edits guests, seating, comms, run of show and travel. Cannot see the budget.',
-  viewer: 'Reads everything except money. Changes nothing.',
+  planner: 'By default: everything operational, including money. Cannot manage the team.',
+  collaborator: 'By default: edits guests, seating, comms, run of show and travel. Cannot see the budget.',
+  viewer: 'By default: reads everything except money, and can comment and chat.',
 };

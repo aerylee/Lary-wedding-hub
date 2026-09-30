@@ -161,7 +161,7 @@ function Events() {
           <thead><tr><TH>Event</TH><TH>When</TH><TH>Where</TH><TH>Dress</TH><TH>Invited</TH></tr></thead>
           <tbody>
             {events.map((e) => (
-              <TR key={e.id} onClick={() => ed.open(e)}>
+              <TR key={e.id} commentKey={e.id} onClick={() => ed.open(e)}>
                 <TD><span className="font-medium">{e.name}</span> {e.is_primary && <Pill tone="warn">primary</Pill>}</TD>
                 <TD>{fmtDate(e.date, { weekday: true })} {fmtTime(e.start_time)}</TD>
                 <TD>{e.location}</TD>

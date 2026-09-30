@@ -72,3 +72,14 @@ export const IconFile = (p: P) => <Icon {...p}><path d="M14 3H6a1 1 0 0 0-1 1v16
 export const IconRefresh = (p: P) => <Icon {...p}><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" /></Icon>;
 export const IconChild = (p: P) => <Icon {...p}><circle cx="12" cy="6" r="3" /><path d="M8 21v-5l-2-3 3-3h6l3 3-2 3v5" /></Icon>;
 export const IconHeart = (p: P) => <Icon {...p}><path d="M12 20s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.2-8 11-8 11Z" /></Icon>;
+export const IconMessage = (p: P) => <Icon {...p}><path d="M4 5h16v11H9l-5 4V5Z" /></Icon>;
+export const IconMessagePlus = (p: P) => <Icon {...p}><path d="M4 5h16v11H9l-5 4V5Z" /><path d="M12 8v5M9.5 10.5h5" /></Icon>;
+export const IconChat = (p: P) => <Icon {...p}><path d="M3 5h12v8H7l-4 3V5Z" /><path d="M9 16v1h8l4 3V9h-3" /></Icon>;
+export const IconHash = (p: P) => <Icon {...p}><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16" /></Icon>;
+export const IconAt = (p: P) => <Icon {...p}><circle cx="12" cy="12" r="4" /><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1" /></Icon>;
+export const IconPin = (p: P) => <Icon {...p}><path d="M9 4h6l-1 5 3 3H7l3-3-1-5ZM12 12v8" /></Icon>;
+export const IconReply = (p: P) => <Icon {...p}><path d="M9 7 4 12l5 5M4 12h11a5 5 0 0 1 5 5v1" /></Icon>;
+export const IconMore = (p: P) => <Icon {...p}><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></Icon>;
+export const IconArchive = (p: P) => <Icon {...p}><rect x="3" y="4" width="18" height="4" rx="1" /><path d="M5 8v11h14V8M10 12h4" /></Icon>;
+export const IconFolder = (p: P) => <Icon {...p}><path d="M3 6h6l2 2h10v11H3V6Z" /></Icon>;
+export const IconList = (p: P) => <Icon {...p}><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></Icon>;
