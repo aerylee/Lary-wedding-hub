@@ -194,7 +194,7 @@ function Templates() {
             )}
             {t.subject && <div className="text-sm"><span className="text-stone-500">Subject: </span><strong>{fillTemplate(t.subject, tokens)}</strong></div>}
             <pre className="whitespace-pre-wrap rounded-lg bg-stone-50 p-4 font-sans text-sm leading-relaxed dark:bg-stone-950">{fillTemplate(t.body, tokens)}</pre>
-            <p className="text-xs text-stone-500">Tokens: {'{couple} {date} {venue} {guests} {household} {rsvpBy} {website}'}. Set the website and RSVP date in Settings.</p>
+            <p className="text-xs text-stone-500">Tokens: {'{couple} {date} {venue} {guests} {household} {rsvpBy} {website}'}. Set the website and RSVP date in Wedding settings.</p>
           </div>
         </Panel>
       ) : (

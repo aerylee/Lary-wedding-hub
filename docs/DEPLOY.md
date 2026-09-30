@@ -55,6 +55,17 @@ If pg_cron or pg_net weren't available when the migration ran, enable them (Data
 
 Build with `npm run build` and deploy `dist/` to any static host. SPA fallbacks are included for Vercel (`vercel.json`) and Netlify / Cloudflare Pages (`public/_redirects`), so `/join?token=…` and deep links resolve. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the host's build environment.
 
-## 6. Before inviting anyone
+## 6. Google Maps address search (optional)
+
+The guest editor can search Google Maps for addresses. Without a key it's hidden and the offline address tools still work.
+
+1. In [Google Cloud Console](https://console.cloud.google.com), create a project and enable billing. The monthly free allowance covers a wedding's guest list many times over.
+2. **APIs & Services → Library:** enable **Maps JavaScript API** and **Places API (New)**.
+3. **APIs & Services → Credentials → Create credentials → API key**, then **Edit** the key:
+   - Application restrictions: **Websites**. Add `http://localhost:5173/*` and `https://<your-domain>/*`.
+   - API restrictions: **Restrict key** to Maps JavaScript API and Places API (New).
+4. Set it as `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` and in your host's build environment. It's a browser key; the restrictions are what protect it.
+
+## 7. Before inviting anyone
 
 Run the checks in [TESTING.md](TESTING.md) against the deployed project.

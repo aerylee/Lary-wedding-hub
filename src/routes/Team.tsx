@@ -4,7 +4,7 @@ import { useAuth, ROLE_BLURB, ROLE_LABEL } from '@/lib/auth';
 import { useStore, type Member } from '@/lib/store';
 import type { AppRole, Invitation } from '@/lib/types';
 import { fmtDate, timeAgo } from '@/lib/util';
-import { Button, Empty, Field, Input, Modal, Panel, PanelHead, Pill, Select, SectionTitle, TD, TH, TWrap } from '@/components/kit';
+import { Button, Empty, Field, Input, Modal, Panel, PanelHead, Pill, Select, TD, TH, TWrap } from '@/components/kit';
 import { IconCopy, IconUsers } from '@/components/icons';
 import { useToast } from '@/components/toast';
 
@@ -19,7 +19,8 @@ const LOSES: Record<AppRole, string> = {
 
 export function Team() {
   const { members, team } = useStore();
-  const { session } = useAuth();
+  const { session, can } = useAuth();
+  const manage = can('members:manage');
   const toast = useToast();
   const [invites, setInvites] = useState<Invitation[]>([]);
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ export function Team() {
   const [busy, setBusy] = useState(false);
   const [removing, setRemoving] = useState<Member | null>(null);
 
-  const reloadInvites = useCallback(() => team.invitations().then(setInvites), [team]);
+  const reloadInvites = useCallback(() => (manage ? team.invitations().then(setInvites) : Promise.resolve()), [team, manage]);
   useEffect(() => {
     reloadInvites();
   }, [reloadInvites]);
@@ -66,12 +67,14 @@ export function Team() {
 
   return (
     <div>
-      <SectionTitle sub="Everyone signs in with an email link. Roles decide what they can see and change — money and guest contact details are the sensitive parts.">
-        Team
-      </SectionTitle>
+      <h2 className="mb-1 mt-8 font-serif text-2xl font-semibold">Team</h2>
+      <p className="mb-4 max-w-2xl text-sm text-stone-500 dark:text-stone-400">
+        Everyone signs in with an email link. Roles decide what they can see and change — money and guest contact details are the sensitive parts.
+        {!manage && ' Only owners can invite people or change roles.'}
+      </p>
 
-      <div className="grid gap-5 lg:grid-cols-3">
-        <Panel className="lg:col-span-2">
+      <div className={manage ? 'grid gap-5 lg:grid-cols-3' : ''}>
+        <Panel className={manage ? 'lg:col-span-2' : ''}>
           <PanelHead title="Members" sub={`${members.length} ${members.length === 1 ? 'person' : 'people'}`} />
           <TWrap>
             <thead>
@@ -93,6 +96,7 @@ export function Team() {
                       <div className="text-xs text-stone-500">{m.profile?.email}</div>
                     </TD>
                     <TD>
+                      {!manage ? <Pill>{ROLE_LABEL[m.role]}</Pill> : (
                       <span title={last ? 'A wedding must keep at least one owner. Make someone else an owner first.' : undefined}>
                         <Select
                           aria-label={`Role for ${m.profile?.email}`}
@@ -104,10 +108,11 @@ export function Team() {
                           {ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
                         </Select>
                       </span>
+                      )}
                     </TD>
                     <TD className="text-stone-500">{m.profile?.last_seen_at ? timeAgo(m.profile.last_seen_at) : 'never'}</TD>
                     <TD align="right">
-                      <Button
+                      {manage && <Button
                         size="sm"
                         variant="danger"
                         disabled={last}
@@ -115,7 +120,7 @@ export function Team() {
                         onClick={() => setRemoving(m)}
                       >
                         {me ? 'Leave' : 'Remove'}
-                      </Button>
+                      </Button>}
                     </TD>
                   </tr>
                 );
@@ -124,7 +129,7 @@ export function Team() {
           </TWrap>
         </Panel>
 
-        <Panel>
+        {manage && <Panel>
           <PanelHead title="Invite someone" />
           <form onSubmit={invite} className="space-y-3 p-4">
             <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="aunt.jo@example.com" /></Field>
@@ -136,10 +141,10 @@ export function Team() {
             <Button type="submit" variant="primary" className="w-full" disabled={busy || !email.includes('@')}>{busy ? 'Inviting…' : 'Send invitation'}</Button>
             <p className="text-xs text-stone-500">Invitations expire after 14 days. Re-inviting the same address replaces the old one.</p>
           </form>
-        </Panel>
+        </Panel>}
       </div>
 
-      <Panel className="mt-5">
+      {manage && <Panel className="mt-5">
         <PanelHead title="Pending invitations" />
         {invites.length === 0 ? (
           <Empty icon={<IconUsers size={24} />} title="No pending invitations" body="Everyone you've invited has joined." />
@@ -177,7 +182,7 @@ export function Team() {
             </tbody>
           </TWrap>
         )}
-      </Panel>
+      </Panel>}
 
       <Modal
         open={!!removing}

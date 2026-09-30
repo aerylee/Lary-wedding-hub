@@ -198,14 +198,15 @@ function Lines({ lines, categories, vendors, onManage }: { lines: BudgetLine[]; 
               return [
                 <tr key={`h-${s.key}`} className="bg-stone-50/70 dark:bg-stone-900/70">
                   <TD colSpan={5} className="font-semibold">{s.name}</TD>
-                  <TD align="right" className="font-semibold">{eur(subtotal)}</TD>
+                  <TD align="right" className="font-semibold"><WithUsd eurAmount={subtotal} fx={fx} /></TD>
                   <TD />
                 </tr>,
                 ...(s.rows.length === 0
                   ? [<tr key={`e-${s.key}`}><TD colSpan={7} className="text-xs text-stone-400">No lines in this category.</TD></tr>]
                   : sortBy(s.rows, (l) => -lineEur(l, headcount, fx).best).map((l) => {
                       const r = lineEur(l, headcount, fx);
-                      const m = (v: number | null) => (v === null ? '—' : fmtMoney(v, l.currency));
+                      // euro figures get their dollar equivalent underneath; dollar lines are already in USD
+                      const m = (v: number | null) => (v === null ? '—' : l.currency === 'EUR' ? <WithUsd eurAmount={v} fx={fx} /> : fmtMoney(v, l.currency));
                       return (
                         <TR key={l.id} onClick={() => ed.open(l)}>
                           <TD>
@@ -221,7 +222,7 @@ function Lines({ lines, categories, vendors, onManage }: { lines: BudgetLine[]; 
                           <TD align="right">{m(l.quoted_eur === null ? null : num(l.quoted_eur))}</TD>
                           <TD align="right">{m(l.contracted_eur === null ? null : num(l.contracted_eur))}</TD>
                           <TD align="right">{m(num(l.paid_eur))}</TD>
-                          <TD align="right" className="font-medium">{eur(r.best)}</TD>
+                          <TD align="right" className="font-medium"><WithUsd eurAmount={r.best} fx={fx} /></TD>
                           <TD className="text-stone-500">{l.funded_by}</TD>
                         </TR>
                       );
@@ -274,6 +275,16 @@ function Lines({ lines, categories, vendors, onManage }: { lines: BudgetLine[]; 
         )}
       </Modal>
     </Panel>
+  );
+}
+
+/** A euro amount with its dollar conversion in small text underneath. */
+function WithUsd({ eurAmount, fx }: { eurAmount: number; fx: number }) {
+  return (
+    <>
+      <div>{eur(eurAmount)}</div>
+      <div className="text-[11px] font-normal text-stone-500 dark:text-stone-400">{usd(eurAmount * fx)}</div>
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { COUNTRIES, checkAddress, formatForMail, parseAddressBlock, type AddressParts } from '@/lib/address';
 import { Area, Button, Field, Input, Modal } from './kit';
 import { IconAlert } from './icons';
+import { AddressSearch } from './AddressSearch';
 
 export function AddressEditor({ value, country, onChange, disabled }: { value: string; country: string; onChange: (address: string, country: string) => void; disabled?: boolean }) {
   const [parts, setParts] = useState<AddressParts | null>(null);
@@ -13,6 +14,7 @@ export function AddressEditor({ value, country, onChange, disabled }: { value: s
 
   return (
     <div>
+      <AddressSearch disabled={disabled} onPick={(block, country) => onChange(block, country)} />
       <Field label="Postal address" hint="Paste it however you have it; Split and Tidy will sort it out.">
         <Area rows={4} value={value} disabled={disabled} onChange={(e) => onChange(e.target.value, country)} placeholder={'1200 Larimer St\nDenver, CO 80202\nUnited States'} />
       </Field>

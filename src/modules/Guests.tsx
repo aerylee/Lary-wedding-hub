@@ -134,7 +134,7 @@ export default function Guests() {
         <Panel>
           <Empty
             title="No guests yet"
-            body="Add people one at a time, or import a spreadsheet. Until then the budget runs on the planning headcount in Settings."
+            body="Add people one at a time, or import a spreadsheet. Until then the budget runs on the planning headcount in Wedding settings."
             action={<div className="flex gap-2"><CanButton perm="guests:write" onClick={() => setImporting(true)}>Import CSV</CanButton><CanButton perm="guests:write" variant="primary" onClick={() => openGuest()}>Add a guest</CanButton></div>}
           />
         </Panel>
@@ -319,7 +319,7 @@ export default function Guests() {
 function RsvpGrid({ guests, events, rsvpBy, onSet, allGuests, rsvps }: { guests: Guest[]; events: WeddingEvent[]; rsvpBy: Map<string, Rsvp>; onSet: (g: Guest, e: WeddingEvent, s: RsvpStatus) => void; allGuests: Guest[]; rsvps: Rsvp[] }) {
   const { can } = useAuth();
   const w = can('guests:write');
-  if (!events.length) return <Panel><Empty title="No events yet" body="Add the weekend's events in Settings to track RSVPs per event." /></Panel>;
+  if (!events.length) return <Panel><Empty title="No events yet" body="Add the weekend's events in Wedding settings to track RSVPs per event." /></Panel>;
   return (
     <Panel>
       <TWrap>
