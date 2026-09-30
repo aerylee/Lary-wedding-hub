@@ -85,7 +85,9 @@ function Shell() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const loc = useLocation();
-  useEffect(() => setMenuOpen(false), [loc.pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [loc.pathname]);
   useEffect(() => {
     if (!menuOpen) return;
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false);

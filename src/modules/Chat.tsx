@@ -566,9 +566,15 @@ function ThreadPane({ parent, channelName, replies, people, canPost, onClose }: 
 }) {
   const { send } = useCollab();
   const [draft, setDraft] = useState('');
-  const end = useRef<HTMLDivElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
   const sorted = [...replies].sort((a, b) => a.created_at.localeCompare(b.created_at));
-  useEffect(() => end.current?.scrollIntoView({ block: 'end' }), [sorted.length]);
+  // Keep the newest reply in view. Scroll only this pane (scrollIntoView would also move
+  // the page), and never return a value from an effect: newer browsers make
+  // scrollIntoView return a promise, and React calls whatever an effect returns as cleanup.
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [sorted.length]);
   const post = async () => {
     const body = draft.trim();
     if (!body) return;
@@ -590,7 +596,7 @@ function ThreadPane({ parent, channelName, replies, people, canPost, onClose }: 
         <span className="font-semibold">Thread</span>
         <IconButton label="Close thread" onClick={onClose}><IconX size={16} /></IconButton>
       </header>
-      <div className="flex-1 overflow-y-auto py-2">
+      <div ref={scroller} className="flex-1 overflow-y-auto py-2">
         <MessageRow m={parent} compact={false} replies={[]} threadSize={sorted.length} people={people} inThread />
         <div className="my-2 flex items-center gap-2 px-4 text-xs text-stone-400">
           {sorted.length ? `${sorted.length} ${sorted.length === 1 ? 'reply' : 'replies'}` : 'No replies yet'}
@@ -601,7 +607,6 @@ function ThreadPane({ parent, channelName, replies, people, canPost, onClose }: 
           const compact = !!prev && prev.author_id === m.author_id && Date.parse(m.created_at) - Date.parse(prev.created_at) < 5 * 60_000;
           return <MessageRow key={m.id} m={m} compact={compact} replies={[]} people={people} inThread />;
         })}
-        <div ref={end} />
       </div>
       {canPost && (
         <div className="shrink-0 border-t border-stone-200 p-3 dark:border-stone-800">

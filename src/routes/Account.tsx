@@ -20,7 +20,9 @@ export function AccountSections({ wide = false }: { wide?: boolean }) {
   const { session, profile, memberships, refreshProfile, signOut } = useAuth();
   const toast = useToast();
   const [name, setName] = useState('');
-  useEffect(() => setName(profile?.full_name ?? ''), [profile?.full_name]);
+  useEffect(() => {
+    setName(profile?.full_name ?? '');
+  }, [profile?.full_name]);
 
   async function save() {
     const { error } = await supabase.from('profiles').update({ full_name: name.trim() }).eq('id', session!.user.id);

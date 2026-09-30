@@ -14,7 +14,9 @@ import { Grid, usePlan } from './common';
 function useSetting<K extends keyof WeddingSettings>(key: K) {
   const { settings, saveSettings } = useStore();
   const [v, setV] = useState(settings[key]);
-  useEffect(() => setV(settings[key]), [settings, key]);
+  useEffect(() => {
+    setV(settings[key]);
+  }, [settings, key]);
   const commit = (next = v) => {
     if (next !== settings[key]) saveSettings({ [key]: next } as Partial<WeddingSettings>).catch(() => setV(settings[key]));
   };
@@ -39,7 +41,9 @@ export default function Settings() {
   const [fx, setFx] = useSetting('fx_eur_usd');
   const [target, setTarget, commitTarget] = useSetting('guest_target');
   const [countries, setCountries] = useState(settings.candidate_countries.join(', '));
-  useEffect(() => setCountries(settings.candidate_countries.join(', ')), [settings.candidate_countries]);
+  useEffect(() => {
+    setCountries(settings.candidate_countries.join(', '));
+  }, [settings.candidate_countries]);
 
   return (
     <div>
