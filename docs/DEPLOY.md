@@ -47,6 +47,8 @@ select vault.create_secret('https://<ref>.supabase.co', 'project_url');
 select vault.create_secret('<service-role-key>',        'service_role_key');
 ```
 
+Use the **legacy `service_role` JWT** (Project Settings → API) as `service_role_key`. The two cron functions accept exactly the key the platform injects as `SUPABASE_SERVICE_ROLE_KEY`. They're deployed with `verify_jwt = false` and check the key themselves.
+
 If pg_cron or pg_net weren't available when the migration ran, enable them (Database → Extensions) and re-run the `do $outer$ … $outer$` block from that migration.
 
 ## 5. Hosting the SPA

@@ -1,47 +1,55 @@
-// GENERATED — do not edit by hand. Regenerate with `npm run db:types` (Supabase CLI)
-// or scripts/db/gen-types.mjs against a plain-Postgres copy of the schema.
-
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.18"
+  }
   public: {
     Tables: {
       activity_log: {
         Row: {
-          id: number
-          wedding_id: string
-          actor_id: string | null
-          table_name: string
-          row_id: string | null
           action: string
-          label: string | null
-          changed: Json | null
-          read_perms: string[]
+          actor_id: string | null
           at: string
+          changed: Json | null
+          id: number
+          label: string | null
+          read_perms: string[]
+          row_id: string | null
+          table_name: string
+          wedding_id: string
         }
         Insert: {
-          id?: number
-          wedding_id: string
-          actor_id?: string | null
-          table_name: string
-          row_id?: string | null
           action: string
-          label?: string | null
-          changed?: Json | null
-          read_perms: string[]
+          actor_id?: string | null
           at?: string
+          changed?: Json | null
+          id?: number
+          label?: string | null
+          read_perms: string[]
+          row_id?: string | null
+          table_name: string
+          wedding_id: string
         }
         Update: {
-          id?: number
-          wedding_id?: string
-          actor_id?: string | null
-          table_name?: string
-          row_id?: string | null
           action?: string
-          label?: string | null
-          changed?: Json | null
-          read_perms?: string[]
+          actor_id?: string | null
           at?: string
+          changed?: Json | null
+          id?: number
+          label?: string | null
+          read_perms?: string[]
+          row_id?: string | null
+          table_name?: string
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -62,46 +70,46 @@ export type Database = {
       }
       attachments: {
         Row: {
-          id: string
-          wedding_id: string
           correspondence_id: string
-          storage_path: string
+          created_at: string
+          created_by: string | null
+          id: string
+          mime: string
           name: string
           size: number
-          mime: string
-          uploaded_by: string | null
-          created_at: string
+          storage_path: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          uploaded_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
           correspondence_id: string
-          storage_path: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mime?: string
           name: string
           size?: number
-          mime?: string
-          uploaded_by?: string | null
-          created_at?: string
+          storage_path: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          uploaded_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
           correspondence_id?: string
-          storage_path?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mime?: string
           name?: string
           size?: number
-          mime?: string
-          uploaded_by?: string | null
-          created_at?: string
+          storage_path?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          uploaded_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -143,34 +151,34 @@ export type Database = {
       }
       budget_categories: {
         Row: {
+          created_at: string
+          created_by: string | null
           id: string
-          wedding_id: string
           name: string
           sort_order: number
-          created_at: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
+          created_at?: string
+          created_by?: string | null
           id?: string
-          wedding_id: string
           name: string
           sort_order?: number
-          created_at?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
+          created_at?: string
+          created_by?: string | null
           id?: string
-          wedding_id?: string
           name?: string
           sort_order?: number
-          created_at?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -198,61 +206,61 @@ export type Database = {
       }
       budget_lines: {
         Row: {
-          id: string
-          wedding_id: string
           category_id: string | null
-          label: string
-          vendor_id: string | null
-          estimate_eur: number
-          quoted_eur: number | null
           contracted_eur: number | null
-          paid_eur: number
-          currency: Database["public"]["Enums"]["currency_code"]
-          per_guest: boolean
-          funded_by: string
-          note: string
           created_at: string
-          updated_at: string
           created_by: string | null
+          currency: Database["public"]["Enums"]["currency_code"]
+          estimate_eur: number
+          funded_by: string
+          id: string
+          label: string
+          note: string
+          paid_eur: number
+          per_guest: boolean
+          quoted_eur: number | null
+          updated_at: string
           updated_by: string | null
+          vendor_id: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
           category_id?: string | null
-          label: string
-          vendor_id?: string | null
-          estimate_eur?: number
-          quoted_eur?: number | null
           contracted_eur?: number | null
-          paid_eur?: number
-          currency?: Database["public"]["Enums"]["currency_code"]
-          per_guest?: boolean
-          funded_by?: string
-          note?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          currency?: Database["public"]["Enums"]["currency_code"]
+          estimate_eur?: number
+          funded_by?: string
+          id?: string
+          label: string
+          note?: string
+          paid_eur?: number
+          per_guest?: boolean
+          quoted_eur?: number | null
+          updated_at?: string
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
           category_id?: string | null
-          label?: string
-          vendor_id?: string | null
-          estimate_eur?: number
-          quoted_eur?: number | null
           contracted_eur?: number | null
-          paid_eur?: number
-          currency?: Database["public"]["Enums"]["currency_code"]
-          per_guest?: boolean
-          funded_by?: string
-          note?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          currency?: Database["public"]["Enums"]["currency_code"]
+          estimate_eur?: number
+          funded_by?: string
+          id?: string
+          label?: string
+          note?: string
+          paid_eur?: number
+          per_guest?: boolean
+          quoted_eur?: number | null
+          updated_at?: string
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -294,28 +302,28 @@ export type Database = {
       }
       budget_settings: {
         Row: {
-          wedding_id: string
           budget_ceiling_usd: number
           created_at: string
-          updated_at: string
           created_by: string | null
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          wedding_id: string
           budget_ceiling_usd?: number
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          wedding_id?: string
           budget_ceiling_usd?: number
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -335,7 +343,7 @@ export type Database = {
           {
             foreignKeyName: "budget_settings_wedding_id_fkey"
             columns: ["wedding_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "weddings"
             referencedColumns: ["id"]
           },
@@ -343,49 +351,49 @@ export type Database = {
       }
       comms_rows: {
         Row: {
-          id: string
-          wedding_id: string
-          household: string
-          save_the_date: string | null
-          invitation: string | null
-          reminder: string | null
-          thank_you: string | null
           channel: string
-          note: string
           created_at: string
-          updated_at: string
           created_by: string | null
+          household: string
+          id: string
+          invitation: string | null
+          note: string
+          reminder: string | null
+          save_the_date: string | null
+          thank_you: string | null
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          household: string
-          save_the_date?: string | null
-          invitation?: string | null
-          reminder?: string | null
-          thank_you?: string | null
           channel?: string
-          note?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          household: string
+          id?: string
+          invitation?: string | null
+          note?: string
+          reminder?: string | null
+          save_the_date?: string | null
+          thank_you?: string | null
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          household?: string
-          save_the_date?: string | null
-          invitation?: string | null
-          reminder?: string | null
-          thank_you?: string | null
           channel?: string
-          note?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          household?: string
+          id?: string
+          invitation?: string | null
+          note?: string
+          reminder?: string | null
+          save_the_date?: string | null
+          thank_you?: string | null
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -413,52 +421,52 @@ export type Database = {
       }
       correspondence: {
         Row: {
-          id: string
-          wedding_id: string
-          vendor_id: string | null
+          channel: string
+          created_at: string
+          created_by: string | null
           date: string
           direction: Database["public"]["Enums"]["comm_direction"]
-          channel: string
+          done: boolean
+          follow_up_by: string | null
+          id: string
           subject: string
           summary: string
-          follow_up_by: string | null
-          done: boolean
-          created_at: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          vendor_id: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          vendor_id?: string | null
+          channel?: string
+          created_at?: string
+          created_by?: string | null
           date?: string
           direction?: Database["public"]["Enums"]["comm_direction"]
-          channel?: string
+          done?: boolean
+          follow_up_by?: string | null
+          id?: string
           subject?: string
           summary?: string
-          follow_up_by?: string | null
-          done?: boolean
-          created_at?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          vendor_id?: string | null
+          channel?: string
+          created_at?: string
+          created_by?: string | null
           date?: string
           direction?: Database["public"]["Enums"]["comm_direction"]
-          channel?: string
+          done?: boolean
+          follow_up_by?: string | null
+          id?: string
           subject?: string
           summary?: string
-          follow_up_by?: string | null
-          done?: boolean
-          created_at?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -493,64 +501,64 @@ export type Database = {
       }
       decisions: {
         Row: {
-          id: string
-          wedding_id: string
-          title: string
+          alternatives: string[]
           area: string
-          status: Database["public"]["Enums"]["decision_status"]
+          created_at: string
+          created_by: string | null
+          created_on: string
           decide_by: string | null
-          decided_on: string | null
           decided_by: string
+          decided_on: string | null
+          id: string
+          impact: string
           outcome: string
           rationale: string
-          alternatives: string[]
-          impact: string
+          status: Database["public"]["Enums"]["decision_status"]
           supersedes_id: string | null
-          created_on: string
-          created_at: string
+          title: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          title: string
+          alternatives?: string[]
           area?: string
-          status?: Database["public"]["Enums"]["decision_status"]
+          created_at?: string
+          created_by?: string | null
+          created_on?: string
           decide_by?: string | null
-          decided_on?: string | null
           decided_by?: string
+          decided_on?: string | null
+          id?: string
+          impact?: string
           outcome?: string
           rationale?: string
-          alternatives?: string[]
-          impact?: string
+          status?: Database["public"]["Enums"]["decision_status"]
           supersedes_id?: string | null
-          created_on?: string
-          created_at?: string
+          title: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          title?: string
+          alternatives?: string[]
           area?: string
-          status?: Database["public"]["Enums"]["decision_status"]
+          created_at?: string
+          created_by?: string | null
+          created_on?: string
           decide_by?: string | null
-          decided_on?: string | null
           decided_by?: string
+          decided_on?: string | null
+          id?: string
+          impact?: string
           outcome?: string
           rationale?: string
-          alternatives?: string[]
-          impact?: string
+          status?: Database["public"]["Enums"]["decision_status"]
           supersedes_id?: string | null
-          created_on?: string
-          created_at?: string
+          title?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -585,55 +593,55 @@ export type Database = {
       }
       events: {
         Row: {
-          id: string
-          wedding_id: string
-          name: string
+          created_at: string
+          created_by: string | null
           date: string | null
-          start_time: string | null
-          location: string
           dress: string
+          id: string
           invited_tier: Database["public"]["Enums"]["invited_tier"]
+          is_primary: boolean
+          location: string
+          name: string
           note: string
           sort_order: number
-          is_primary: boolean
-          created_at: string
+          start_time: string | null
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          name: string
+          created_at?: string
+          created_by?: string | null
           date?: string | null
-          start_time?: string | null
-          location?: string
           dress?: string
+          id?: string
           invited_tier?: Database["public"]["Enums"]["invited_tier"]
+          is_primary?: boolean
+          location?: string
+          name: string
           note?: string
           sort_order?: number
-          is_primary?: boolean
-          created_at?: string
+          start_time?: string | null
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          name?: string
+          created_at?: string
+          created_by?: string | null
           date?: string | null
-          start_time?: string | null
-          location?: string
           dress?: string
+          id?: string
           invited_tier?: Database["public"]["Enums"]["invited_tier"]
+          is_primary?: boolean
+          location?: string
+          name?: string
           note?: string
           sort_order?: number
-          is_primary?: boolean
-          created_at?: string
+          start_time?: string | null
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -661,40 +669,40 @@ export type Database = {
       }
       faqs: {
         Row: {
-          id: string
-          wedding_id: string
-          question: string
           answer: string
-          sort_order: number
-          published: boolean
           created_at: string
-          updated_at: string
           created_by: string | null
+          id: string
+          published: boolean
+          question: string
+          sort_order: number
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          question: string
           answer?: string
-          sort_order?: number
-          published?: boolean
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          id?: string
+          published?: boolean
+          question: string
+          sort_order?: number
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          question?: string
           answer?: string
-          sort_order?: number
-          published?: boolean
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          id?: string
+          published?: boolean
+          question?: string
+          sort_order?: number
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -722,43 +730,43 @@ export type Database = {
       }
       guest_contacts: {
         Row: {
-          id: string
-          wedding_id: string
-          guest_id: string
-          email: string
-          phone: string
           address: string
           country: string
           created_at: string
-          updated_at: string
           created_by: string | null
+          email: string
+          guest_id: string
+          id: string
+          phone: string
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          guest_id: string
-          email?: string
-          phone?: string
           address?: string
           country?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          email?: string
+          guest_id: string
+          id?: string
+          phone?: string
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          guest_id?: string
-          email?: string
-          phone?: string
           address?: string
           country?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          email?: string
+          guest_id?: string
+          id?: string
+          phone?: string
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -793,85 +801,85 @@ export type Database = {
       }
       guests: {
         Row: {
-          id: string
-          wedding_id: string
-          household: string
-          first_name: string
-          last_name: string
-          side: Database["public"]["Enums"]["guest_side"]
-          tier: Database["public"]["Enums"]["guest_tier"]
-          relationship: string
-          is_child: boolean
-          plus_one_for: string | null
-          meal: string
-          dietary: string
-          room_id: string | null
-          table_id: string | null
           arrival: string | null
-          departure: string | null
           arrival_flight: string
-          departure_flight: string
-          needs_shuttle: boolean
-          invite_sent: string | null
-          notes: string
           created_at: string
-          updated_at: string
           created_by: string | null
+          departure: string | null
+          departure_flight: string
+          dietary: string
+          first_name: string
+          household: string
+          id: string
+          invite_sent: string | null
+          is_child: boolean
+          last_name: string
+          meal: string
+          needs_shuttle: boolean
+          notes: string
+          plus_one_for: string | null
+          relationship: string
+          room_id: string | null
+          side: Database["public"]["Enums"]["guest_side"]
+          table_id: string | null
+          tier: Database["public"]["Enums"]["guest_tier"]
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          household?: string
-          first_name?: string
-          last_name?: string
-          side?: Database["public"]["Enums"]["guest_side"]
-          tier?: Database["public"]["Enums"]["guest_tier"]
-          relationship?: string
-          is_child?: boolean
-          plus_one_for?: string | null
-          meal?: string
-          dietary?: string
-          room_id?: string | null
-          table_id?: string | null
           arrival?: string | null
-          departure?: string | null
           arrival_flight?: string
-          departure_flight?: string
-          needs_shuttle?: boolean
-          invite_sent?: string | null
-          notes?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          departure?: string | null
+          departure_flight?: string
+          dietary?: string
+          first_name?: string
+          household?: string
+          id?: string
+          invite_sent?: string | null
+          is_child?: boolean
+          last_name?: string
+          meal?: string
+          needs_shuttle?: boolean
+          notes?: string
+          plus_one_for?: string | null
+          relationship?: string
+          room_id?: string | null
+          side?: Database["public"]["Enums"]["guest_side"]
+          table_id?: string | null
+          tier?: Database["public"]["Enums"]["guest_tier"]
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          household?: string
-          first_name?: string
-          last_name?: string
-          side?: Database["public"]["Enums"]["guest_side"]
-          tier?: Database["public"]["Enums"]["guest_tier"]
-          relationship?: string
-          is_child?: boolean
-          plus_one_for?: string | null
-          meal?: string
-          dietary?: string
-          room_id?: string | null
-          table_id?: string | null
           arrival?: string | null
-          departure?: string | null
           arrival_flight?: string
-          departure_flight?: string
-          needs_shuttle?: boolean
-          invite_sent?: string | null
-          notes?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          departure?: string | null
+          departure_flight?: string
+          dietary?: string
+          first_name?: string
+          household?: string
+          id?: string
+          invite_sent?: string | null
+          is_child?: boolean
+          last_name?: string
+          meal?: string
+          needs_shuttle?: boolean
+          notes?: string
+          plus_one_for?: string | null
+          relationship?: string
+          room_id?: string | null
+          side?: Database["public"]["Enums"]["guest_side"]
+          table_id?: string | null
+          tier?: Database["public"]["Enums"]["guest_tier"]
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -920,40 +928,40 @@ export type Database = {
       }
       invitations: {
         Row: {
-          id: string
-          wedding_id: string
-          email: string
-          role: Database["public"]["Enums"]["app_role"]
-          invited_by: string
-          token: string
-          expires_at: string
           accepted_at: string | null
           accepted_by: string | null
           created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          token: string
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          email: string
-          role: Database["public"]["Enums"]["app_role"]
-          invited_by: string
-          token?: string
-          expires_at?: string
           accepted_at?: string | null
           accepted_by?: string | null
           created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          token?: string
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          email?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          invited_by?: string
-          token?: string
-          expires_at?: string
           accepted_at?: string | null
           accepted_by?: string | null
           created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          token?: string
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -981,64 +989,64 @@ export type Database = {
       }
       legal_docs: {
         Row: {
-          id: string
-          wedding_id: string
           country: string
-          title: string
-          who: string
+          created_at: string
+          created_by: string | null
+          expires_on: string | null
+          id: string
           issued_by: string
+          lead_time: string
           needs_apostille: boolean
           needs_translation: boolean
-          validity_days: number | null
-          lead_time: string
-          status: Database["public"]["Enums"]["legal_status"]
-          obtained_on: string | null
-          expires_on: string | null
           note: string
-          created_at: string
+          obtained_on: string | null
+          status: Database["public"]["Enums"]["legal_status"]
+          title: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          validity_days: number | null
+          wedding_id: string
+          who: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
           country?: string
-          title: string
-          who?: string
+          created_at?: string
+          created_by?: string | null
+          expires_on?: string | null
+          id?: string
           issued_by?: string
+          lead_time?: string
           needs_apostille?: boolean
           needs_translation?: boolean
-          validity_days?: number | null
-          lead_time?: string
-          status?: Database["public"]["Enums"]["legal_status"]
-          obtained_on?: string | null
-          expires_on?: string | null
           note?: string
-          created_at?: string
+          obtained_on?: string | null
+          status?: Database["public"]["Enums"]["legal_status"]
+          title: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          validity_days?: number | null
+          wedding_id: string
+          who?: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
           country?: string
-          title?: string
-          who?: string
+          created_at?: string
+          created_by?: string | null
+          expires_on?: string | null
+          id?: string
           issued_by?: string
+          lead_time?: string
           needs_apostille?: boolean
           needs_translation?: boolean
-          validity_days?: number | null
-          lead_time?: string
-          status?: Database["public"]["Enums"]["legal_status"]
-          obtained_on?: string | null
-          expires_on?: string | null
           note?: string
-          created_at?: string
+          obtained_on?: string | null
+          status?: Database["public"]["Enums"]["legal_status"]
+          title?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          validity_days?: number | null
+          wedding_id?: string
+          who?: string
         }
         Relationships: [
           {
@@ -1066,31 +1074,31 @@ export type Database = {
       }
       memberships: {
         Row: {
+          created_at: string
           id: string
-          wedding_id: string
-          user_id: string
+          invited_by: string | null
           role: Database["public"]["Enums"]["app_role"]
           status: Database["public"]["Enums"]["membership_status"]
-          invited_by: string | null
-          created_at: string
+          user_id: string
+          wedding_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
-          wedding_id: string
-          user_id: string
+          invited_by?: string | null
           role: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["membership_status"]
-          invited_by?: string | null
-          created_at?: string
+          user_id: string
+          wedding_id: string
         }
         Update: {
+          created_at?: string
           id?: string
-          wedding_id?: string
-          user_id?: string
+          invited_by?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["membership_status"]
-          invited_by?: string | null
-          created_at?: string
+          user_id?: string
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1118,55 +1126,55 @@ export type Database = {
       }
       payments: {
         Row: {
-          id: string
-          wedding_id: string
-          label: string
-          line_id: string | null
-          vendor_id: string | null
           amount: number
+          created_at: string
+          created_by: string | null
           currency: Database["public"]["Enums"]["currency_code"]
           due_date: string | null
-          paid_date: string | null
+          id: string
+          label: string
+          line_id: string | null
           method: string
           note: string
-          created_at: string
+          paid_date: string | null
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          vendor_id: string | null
+          wedding_id: string
         }
         Insert: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: Database["public"]["Enums"]["currency_code"]
+          due_date?: string | null
           id?: string
-          wedding_id: string
           label: string
           line_id?: string | null
-          vendor_id?: string | null
-          amount?: number
-          currency?: Database["public"]["Enums"]["currency_code"]
-          due_date?: string | null
-          paid_date?: string | null
           method?: string
           note?: string
-          created_at?: string
+          paid_date?: string | null
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          label?: string
-          line_id?: string | null
-          vendor_id?: string | null
           amount?: number
+          created_at?: string
+          created_by?: string | null
           currency?: Database["public"]["Enums"]["currency_code"]
           due_date?: string | null
-          paid_date?: string | null
+          id?: string
+          label?: string
+          line_id?: string | null
           method?: string
           note?: string
-          created_at?: string
+          paid_date?: string | null
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1208,102 +1216,100 @@ export type Database = {
       }
       profiles: {
         Row: {
-          id: string
+          avatar_url: string
+          created_at: string
           email: string
           full_name: string
-          avatar_url: string
+          id: string
           last_seen_at: string | null
-          created_at: string
         }
         Insert: {
-          id: string
+          avatar_url?: string
+          created_at?: string
           email: string
           full_name?: string
-          avatar_url?: string
+          id: string
           last_seen_at?: string | null
-          created_at?: string
         }
         Update: {
-          id?: string
+          avatar_url?: string
+          created_at?: string
           email?: string
           full_name?: string
-          avatar_url?: string
+          id?: string
           last_seen_at?: string | null
-          created_at?: string
         }
-        Relationships: [
-        ]
+        Relationships: []
       }
       role_permissions: {
         Row: {
-          role: Database["public"]["Enums"]["app_role"]
           permission: string
+          role: Database["public"]["Enums"]["app_role"]
         }
         Insert: {
-          role: Database["public"]["Enums"]["app_role"]
           permission: string
+          role: Database["public"]["Enums"]["app_role"]
         }
         Update: {
-          role?: Database["public"]["Enums"]["app_role"]
           permission?: string
+          role?: Database["public"]["Enums"]["app_role"]
         }
-        Relationships: [
-        ]
+        Relationships: []
       }
       rooms: {
         Row: {
-          id: string
-          wedding_id: string
-          property: string
-          name: string
-          type: string
+          assigned_to: string
           beds: number
+          created_at: string
+          created_by: string | null
+          held_until: string | null
+          id: string
+          name: string
           nightly_eur: number | null
           nights: number
-          held_until: string | null
-          assigned_to: string
-          status: Database["public"]["Enums"]["room_status"]
           note: string
-          created_at: string
+          property: string
+          status: Database["public"]["Enums"]["room_status"]
+          type: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          property?: string
-          name: string
-          type?: string
+          assigned_to?: string
           beds?: number
+          created_at?: string
+          created_by?: string | null
+          held_until?: string | null
+          id?: string
+          name: string
           nightly_eur?: number | null
           nights?: number
-          held_until?: string | null
-          assigned_to?: string
-          status?: Database["public"]["Enums"]["room_status"]
           note?: string
-          created_at?: string
+          property?: string
+          status?: Database["public"]["Enums"]["room_status"]
+          type?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          property?: string
-          name?: string
-          type?: string
+          assigned_to?: string
           beds?: number
+          created_at?: string
+          created_by?: string | null
+          held_until?: string | null
+          id?: string
+          name?: string
           nightly_eur?: number | null
           nights?: number
-          held_until?: string | null
-          assigned_to?: string
-          status?: Database["public"]["Enums"]["room_status"]
           note?: string
-          created_at?: string
+          property?: string
+          status?: Database["public"]["Enums"]["room_status"]
+          type?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1331,40 +1337,40 @@ export type Database = {
       }
       rsvps: {
         Row: {
-          id: string
-          wedding_id: string
-          guest_id: string
-          event_id: string
-          status: Database["public"]["Enums"]["rsvp_status"]
-          responded_at: string | null
           created_at: string
-          updated_at: string
           created_by: string | null
+          event_id: string
+          guest_id: string
+          id: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["rsvp_status"]
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          guest_id: string
-          event_id: string
-          status?: Database["public"]["Enums"]["rsvp_status"]
-          responded_at?: string | null
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          event_id: string
+          guest_id: string
+          id?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["rsvp_status"]
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          guest_id?: string
-          event_id?: string
-          status?: Database["public"]["Enums"]["rsvp_status"]
-          responded_at?: string | null
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          event_id?: string
+          guest_id?: string
+          id?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["rsvp_status"]
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1406,55 +1412,55 @@ export type Database = {
       }
       schedule_items: {
         Row: {
-          id: string
-          wedding_id: string
-          event_id: string
-          time: string | null
-          duration_mins: number
-          title: string
-          detail: string
-          owner: string
-          vendor_id: string | null
-          location: string
-          kind: Database["public"]["Enums"]["schedule_kind"]
           created_at: string
-          updated_at: string
           created_by: string | null
+          detail: string
+          duration_mins: number
+          event_id: string
+          id: string
+          kind: Database["public"]["Enums"]["schedule_kind"]
+          location: string
+          owner: string
+          time: string | null
+          title: string
+          updated_at: string
           updated_by: string | null
+          vendor_id: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          event_id: string
-          time?: string | null
-          duration_mins?: number
-          title: string
-          detail?: string
-          owner?: string
-          vendor_id?: string | null
-          location?: string
-          kind?: Database["public"]["Enums"]["schedule_kind"]
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          detail?: string
+          duration_mins?: number
+          event_id: string
+          id?: string
+          kind?: Database["public"]["Enums"]["schedule_kind"]
+          location?: string
+          owner?: string
+          time?: string | null
+          title: string
+          updated_at?: string
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          event_id?: string
-          time?: string | null
-          duration_mins?: number
-          title?: string
-          detail?: string
-          owner?: string
-          vendor_id?: string | null
-          location?: string
-          kind?: Database["public"]["Enums"]["schedule_kind"]
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          detail?: string
+          duration_mins?: number
+          event_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["schedule_kind"]
+          location?: string
+          owner?: string
+          time?: string | null
+          title?: string
+          updated_at?: string
           updated_by?: string | null
+          vendor_id?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1496,46 +1502,46 @@ export type Database = {
       }
       seat_tables: {
         Row: {
+          created_at: string
+          created_by: string | null
           id: string
-          wedding_id: string
           name: string
-          shape: Database["public"]["Enums"]["table_shape"]
+          note: string
           seats: number
+          shape: Database["public"]["Enums"]["table_shape"]
+          updated_at: string
+          updated_by: string | null
+          wedding_id: string
           x: number
           y: number
-          note: string
-          created_at: string
-          updated_at: string
-          created_by: string | null
-          updated_by: string | null
         }
         Insert: {
+          created_at?: string
+          created_by?: string | null
           id?: string
-          wedding_id: string
           name: string
-          shape?: Database["public"]["Enums"]["table_shape"]
+          note?: string
           seats?: number
+          shape?: Database["public"]["Enums"]["table_shape"]
+          updated_at?: string
+          updated_by?: string | null
+          wedding_id: string
           x?: number
           y?: number
-          note?: string
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
         }
         Update: {
+          created_at?: string
+          created_by?: string | null
           id?: string
-          wedding_id?: string
           name?: string
-          shape?: Database["public"]["Enums"]["table_shape"]
+          note?: string
           seats?: number
+          shape?: Database["public"]["Enums"]["table_shape"]
+          updated_at?: string
+          updated_by?: string | null
+          wedding_id?: string
           x?: number
           y?: number
-          note?: string
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
         }
         Relationships: [
           {
@@ -1563,55 +1569,55 @@ export type Database = {
       }
       tasks: {
         Row: {
-          id: string
-          wedding_id: string
-          title: string
-          phase: string
-          offset_days: number
-          due_override: string | null
-          owner: string
-          status: Database["public"]["Enums"]["task_status"]
           category: string
-          note: string
-          critical: boolean
           created_at: string
-          updated_at: string
           created_by: string | null
+          critical: boolean
+          due_override: string | null
+          id: string
+          note: string
+          offset_days: number
+          owner: string
+          phase: string
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          title: string
-          phase?: string
-          offset_days?: number
-          due_override?: string | null
-          owner?: string
-          status?: Database["public"]["Enums"]["task_status"]
           category?: string
-          note?: string
-          critical?: boolean
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          critical?: boolean
+          due_override?: string | null
+          id?: string
+          note?: string
+          offset_days?: number
+          owner?: string
+          phase?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          title?: string
-          phase?: string
-          offset_days?: number
-          due_override?: string | null
-          owner?: string
-          status?: Database["public"]["Enums"]["task_status"]
           category?: string
-          note?: string
-          critical?: boolean
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          critical?: boolean
+          due_override?: string | null
+          id?: string
+          note?: string
+          offset_days?: number
+          owner?: string
+          phase?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1639,46 +1645,46 @@ export type Database = {
       }
       templates: {
         Row: {
-          id: string
-          wedding_id: string
-          name: string
           audience: Database["public"]["Enums"]["template_audience"]
-          channel: string
-          subject: string
           body: string
-          sort_order: number
+          channel: string
           created_at: string
-          updated_at: string
           created_by: string | null
+          id: string
+          name: string
+          sort_order: number
+          subject: string
+          updated_at: string
           updated_by: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          name: string
           audience?: Database["public"]["Enums"]["template_audience"]
-          channel?: string
-          subject?: string
           body?: string
-          sort_order?: number
+          channel?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          subject?: string
+          updated_at?: string
           updated_by?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          name?: string
           audience?: Database["public"]["Enums"]["template_audience"]
-          channel?: string
-          subject?: string
           body?: string
-          sort_order?: number
+          channel?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
+          subject?: string
+          updated_at?: string
           updated_by?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1706,43 +1712,43 @@ export type Database = {
       }
       vendor_finance: {
         Row: {
-          id: string
-          wedding_id: string
-          vendor_id: string
-          quote_eur: number | null
-          deposit_eur: number | null
-          deposit_due: string | null
           balance_due: string | null
           created_at: string
-          updated_at: string
           created_by: string | null
+          deposit_due: string | null
+          deposit_eur: number | null
+          id: string
+          quote_eur: number | null
+          updated_at: string
           updated_by: string | null
+          vendor_id: string
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          vendor_id: string
-          quote_eur?: number | null
-          deposit_eur?: number | null
-          deposit_due?: string | null
           balance_due?: string | null
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          deposit_due?: string | null
+          deposit_eur?: number | null
+          id?: string
+          quote_eur?: number | null
+          updated_at?: string
           updated_by?: string | null
+          vendor_id: string
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          vendor_id?: string
-          quote_eur?: number | null
-          deposit_eur?: number | null
-          deposit_due?: string | null
           balance_due?: string | null
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          deposit_due?: string | null
+          deposit_eur?: number | null
+          id?: string
+          quote_eur?: number | null
+          updated_at?: string
           updated_by?: string | null
+          vendor_id?: string
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1777,61 +1783,61 @@ export type Database = {
       }
       vendors: {
         Row: {
-          id: string
-          wedding_id: string
-          name: string
-          category: string
-          status: Database["public"]["Enums"]["vendor_status"]
-          contact: string
-          email: string
-          phone: string
-          country: string
-          language: string
-          website: string
           cancellation: string
-          notes: string
+          category: string
+          contact: string
+          country: string
           created_at: string
-          updated_at: string
           created_by: string | null
+          email: string
+          id: string
+          language: string
+          name: string
+          notes: string
+          phone: string
+          status: Database["public"]["Enums"]["vendor_status"]
+          updated_at: string
           updated_by: string | null
+          website: string
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          name: string
-          category?: string
-          status?: Database["public"]["Enums"]["vendor_status"]
-          contact?: string
-          email?: string
-          phone?: string
-          country?: string
-          language?: string
-          website?: string
           cancellation?: string
-          notes?: string
+          category?: string
+          contact?: string
+          country?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          email?: string
+          id?: string
+          language?: string
+          name: string
+          notes?: string
+          phone?: string
+          status?: Database["public"]["Enums"]["vendor_status"]
+          updated_at?: string
           updated_by?: string | null
+          website?: string
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          name?: string
-          category?: string
-          status?: Database["public"]["Enums"]["vendor_status"]
-          contact?: string
-          email?: string
-          phone?: string
-          country?: string
-          language?: string
-          website?: string
           cancellation?: string
-          notes?: string
+          category?: string
+          contact?: string
+          country?: string
           created_at?: string
-          updated_at?: string
           created_by?: string | null
+          email?: string
+          id?: string
+          language?: string
+          name?: string
+          notes?: string
+          phone?: string
+          status?: Database["public"]["Enums"]["vendor_status"]
+          updated_at?: string
           updated_by?: string | null
+          website?: string
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1859,97 +1865,97 @@ export type Database = {
       }
       venues: {
         Row: {
-          id: string
-          wedding_id: string
-          name: string
-          status: Database["public"]["Enums"]["venue_status"]
-          country: string
-          region: string
-          town: string
-          url: string
-          nearest_airport: string
           airport_mins: number | null
-          capacity_seated: number | null
           beds_on_site: number | null
+          capacity_seated: number | null
           catering_model: string
+          cons: string[]
+          country: string
+          created_at: string
+          created_by: string | null
           curfew: string
-          rain_plan: string
           exclusivity: string
+          hold_expires: string | null
+          id: string
+          legal_note: string
+          name: string
+          nearest_airport: string
+          notes: string
+          pros: string[]
           quote_eur: number | null
           quote_is_estimate: boolean
-          hold_expires: string | null
-          legal_note: string
+          rain_plan: string
+          region: string
           scores: Json
-          pros: string[]
-          cons: string[]
-          notes: string
-          visit_date: string | null
-          created_at: string
+          status: Database["public"]["Enums"]["venue_status"]
+          town: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          url: string
+          visit_date: string | null
+          wedding_id: string
         }
         Insert: {
-          id?: string
-          wedding_id: string
-          name: string
-          status?: Database["public"]["Enums"]["venue_status"]
-          country?: string
-          region?: string
-          town?: string
-          url?: string
-          nearest_airport?: string
           airport_mins?: number | null
-          capacity_seated?: number | null
           beds_on_site?: number | null
+          capacity_seated?: number | null
           catering_model?: string
+          cons?: string[]
+          country?: string
+          created_at?: string
+          created_by?: string | null
           curfew?: string
-          rain_plan?: string
           exclusivity?: string
+          hold_expires?: string | null
+          id?: string
+          legal_note?: string
+          name: string
+          nearest_airport?: string
+          notes?: string
+          pros?: string[]
           quote_eur?: number | null
           quote_is_estimate?: boolean
-          hold_expires?: string | null
-          legal_note?: string
+          rain_plan?: string
+          region?: string
           scores?: Json
-          pros?: string[]
-          cons?: string[]
-          notes?: string
-          visit_date?: string | null
-          created_at?: string
+          status?: Database["public"]["Enums"]["venue_status"]
+          town?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          url?: string
+          visit_date?: string | null
+          wedding_id: string
         }
         Update: {
-          id?: string
-          wedding_id?: string
-          name?: string
-          status?: Database["public"]["Enums"]["venue_status"]
-          country?: string
-          region?: string
-          town?: string
-          url?: string
-          nearest_airport?: string
           airport_mins?: number | null
-          capacity_seated?: number | null
           beds_on_site?: number | null
+          capacity_seated?: number | null
           catering_model?: string
+          cons?: string[]
+          country?: string
+          created_at?: string
+          created_by?: string | null
           curfew?: string
-          rain_plan?: string
           exclusivity?: string
+          hold_expires?: string | null
+          id?: string
+          legal_note?: string
+          name?: string
+          nearest_airport?: string
+          notes?: string
+          pros?: string[]
           quote_eur?: number | null
           quote_is_estimate?: boolean
-          hold_expires?: string | null
-          legal_note?: string
+          rain_plan?: string
+          region?: string
           scores?: Json
-          pros?: string[]
-          cons?: string[]
-          notes?: string
-          visit_date?: string | null
-          created_at?: string
+          status?: Database["public"]["Enums"]["venue_status"]
+          town?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          url?: string
+          visit_date?: string | null
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -1977,61 +1983,61 @@ export type Database = {
       }
       wedding_settings: {
         Row: {
-          wedding_id: string
+          candidate_countries: string[]
           couple_a: string
           couple_b: string
-          target_date: string
+          created_at: string
+          created_by: string | null
           date_is_firm: boolean
+          decide_venue_by: string | null
           fx_eur_usd: number
           fx_set_on: string
           fx_source: Database["public"]["Enums"]["fx_source"]
           guest_target: number
-          decide_venue_by: string | null
           rsvp_by: string | null
-          website: string
-          candidate_countries: string[]
-          created_at: string
+          target_date: string
           updated_at: string
-          created_by: string | null
           updated_by: string | null
+          website: string
+          wedding_id: string
         }
         Insert: {
-          wedding_id: string
+          candidate_countries?: string[]
           couple_a?: string
           couple_b?: string
-          target_date?: string
+          created_at?: string
+          created_by?: string | null
           date_is_firm?: boolean
+          decide_venue_by?: string | null
           fx_eur_usd?: number
           fx_set_on?: string
           fx_source?: Database["public"]["Enums"]["fx_source"]
           guest_target?: number
-          decide_venue_by?: string | null
           rsvp_by?: string | null
-          website?: string
-          candidate_countries?: string[]
-          created_at?: string
+          target_date?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          website?: string
+          wedding_id: string
         }
         Update: {
-          wedding_id?: string
+          candidate_countries?: string[]
           couple_a?: string
           couple_b?: string
-          target_date?: string
+          created_at?: string
+          created_by?: string | null
           date_is_firm?: boolean
+          decide_venue_by?: string | null
           fx_eur_usd?: number
           fx_set_on?: string
           fx_source?: Database["public"]["Enums"]["fx_source"]
           guest_target?: number
-          decide_venue_by?: string | null
           rsvp_by?: string | null
-          website?: string
-          candidate_countries?: string[]
-          created_at?: string
+          target_date?: string
           updated_at?: string
-          created_by?: string | null
           updated_by?: string | null
+          website?: string
+          wedding_id?: string
         }
         Relationships: [
           {
@@ -2051,7 +2057,7 @@ export type Database = {
           {
             foreignKeyName: "wedding_settings_wedding_id_fkey"
             columns: ["wedding_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "weddings"
             referencedColumns: ["id"]
           },
@@ -2059,25 +2065,25 @@ export type Database = {
       }
       weddings: {
         Row: {
+          archived_at: string | null
+          created_at: string
+          created_by: string
           id: string
           name: string
-          created_by: string
-          created_at: string
-          archived_at: string | null
         }
         Insert: {
+          archived_at?: string | null
+          created_at?: string
+          created_by: string
           id?: string
           name: string
-          created_by: string
-          created_at?: string
-          archived_at?: string | null
         }
         Update: {
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string
           id?: string
           name?: string
-          created_by?: string
-          created_at?: string
-          archived_at?: string | null
         }
         Relationships: [
           {
@@ -2094,64 +2100,71 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      accept_invitation: {
-        Args: {
-          p_token: string
-        }
-        Returns: string
-      }
+      accept_invitation: { Args: { p_token: string }; Returns: string }
       assistant_take_token: {
-        Args: {
-          w: string
-          p_kind?: string
-        }
+        Args: { p_kind?: string; w: string }
         Returns: boolean
       }
+      claim_storage_purge: { Args: { p_limit?: number }; Returns: string[] }
       create_wedding: {
         Args: {
-          p_name: string
-          p_target_date?: string
           p_couple_a?: string
           p_couple_b?: string
+          p_name: string
+          p_target_date?: string
         }
         Returns: string
       }
       invite_member: {
         Args: {
-          w: string
           p_email: string
           p_role: Database["public"]["Enums"]["app_role"]
-        }
-        Returns: Database["public"]["Tables"]["invitations"]["Row"]
-      }
-      my_permissions: {
-        Args: {
           w: string
         }
-        Returns: string[]
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          token: string
+          wedding_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "invitations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
+      my_permissions: { Args: { w: string }; Returns: string[] }
       resend_invitation: {
-        Args: {
-          p_id: string
+        Args: { p_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          token: string
+          wedding_id: string
         }
-        Returns: Database["public"]["Tables"]["invitations"]["Row"]
-      }
-      revoke_invitation: {
-        Args: {
-          p_id: string
+        SetofOptions: {
+          from: "*"
+          to: "invitations"
+          isOneToOne: true
+          isSetofReturn: false
         }
-        Returns: undefined
       }
-      seed_wedding: {
-        Args: {
-          w: string
-        }
-        Returns: undefined
-      }
-      touch_last_seen: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      revoke_invitation: { Args: { p_id: string }; Returns: undefined }
+      seed_wedding: { Args: { w: string }; Returns: undefined }
+      touch_last_seen: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "owner" | "planner" | "collaborator" | "viewer"
@@ -2162,16 +2175,40 @@ export type Database = {
       guest_side: "A" | "B" | "both"
       guest_tier: "A" | "B"
       invited_tier: "A" | "all"
-      legal_status: "not_started" | "in_progress" | "obtained" | "expired" | "na"
+      legal_status:
+        | "not_started"
+        | "in_progress"
+        | "obtained"
+        | "expired"
+        | "na"
       membership_status: "active" | "suspended"
       room_status: "held" | "confirmed" | "released"
       rsvp_status: "pending" | "yes" | "no" | "maybe"
-      schedule_kind: "moment" | "vendor" | "logistics" | "food" | "music" | "photo"
+      schedule_kind:
+        | "moment"
+        | "vendor"
+        | "logistics"
+        | "food"
+        | "music"
+        | "photo"
       table_shape: "round" | "long" | "head"
       task_status: "todo" | "doing" | "done" | "na"
       template_audience: "guest" | "vendor"
-      vendor_status: "researching" | "contacted" | "quoted" | "booked" | "deposit_paid" | "complete" | "passed"
-      venue_status: "shortlist" | "visiting" | "quoted" | "held" | "booked" | "passed"
+      vendor_status:
+        | "researching"
+        | "contacted"
+        | "quoted"
+        | "booked"
+        | "deposit_paid"
+        | "complete"
+        | "passed"
+      venue_status:
+        | "shortlist"
+        | "visiting"
+        | "quoted"
+        | "held"
+        | "booked"
+        | "passed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2179,8 +2216,166 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database["public"]
-export type Tables<T extends keyof PublicSchema["Tables"]> = PublicSchema["Tables"][T]["Row"]
-export type TablesInsert<T extends keyof PublicSchema["Tables"]> = PublicSchema["Tables"][T]["Insert"]
-export type TablesUpdate<T extends keyof PublicSchema["Tables"]> = PublicSchema["Tables"][T]["Update"]
-export type Enums<T extends keyof PublicSchema["Enums"]> = PublicSchema["Enums"][T]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      app_role: ["owner", "planner", "collaborator", "viewer"],
+      comm_direction: ["sent", "received"],
+      currency_code: ["EUR", "USD"],
+      decision_status: ["open", "decided", "parked"],
+      fx_source: ["auto", "manual"],
+      guest_side: ["A", "B", "both"],
+      guest_tier: ["A", "B"],
+      invited_tier: ["A", "all"],
+      legal_status: ["not_started", "in_progress", "obtained", "expired", "na"],
+      membership_status: ["active", "suspended"],
+      room_status: ["held", "confirmed", "released"],
+      rsvp_status: ["pending", "yes", "no", "maybe"],
+      schedule_kind: [
+        "moment",
+        "vendor",
+        "logistics",
+        "food",
+        "music",
+        "photo",
+      ],
+      table_shape: ["round", "long", "head"],
+      task_status: ["todo", "doing", "done", "na"],
+      template_audience: ["guest", "vendor"],
+      vendor_status: [
+        "researching",
+        "contacted",
+        "quoted",
+        "booked",
+        "deposit_paid",
+        "complete",
+        "passed",
+      ],
+      venue_status: [
+        "shortlist",
+        "visiting",
+        "quoted",
+        "held",
+        "booked",
+        "passed",
+      ],
+    },
+  },
+} as const
