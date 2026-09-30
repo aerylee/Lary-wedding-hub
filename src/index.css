@@ -15,3 +15,15 @@
 [data-comment-mode] [data-comment-root] * {
   cursor: crosshair !important;
 }
+
+/* the comments sidebar docks on the right from lg up; floating widgets move clear of it.
+   Below lg it's a drawer over the page, so they step out of the way entirely. */
+@media (max-width: 1023px) {
+  [data-comments-open] .assistant-dock { display: none; }
+}
+@media (min-width: 1024px) {
+  [data-comments-open] .assistant-dock { right: calc(20rem + 1.25rem); }
+}
+@media (min-width: 1280px) {
+  [data-comments-open] .assistant-dock { right: calc(24rem + 1.25rem); }
+}

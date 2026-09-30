@@ -58,7 +58,7 @@ export function CommentLayer({ children }: { children: ReactNode }) {
   const loc = useLocation();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const { can, session } = useAuth();
+  const { can } = useAuth();
   const { weddingId } = useStore();
   const { comments, mentions } = useCollab();
   const page = pageOf(loc.pathname);
@@ -184,6 +184,12 @@ export function CommentLayer({ children }: { children: ReactNode }) {
     [page, commentable, mode, setMode, panel, openThread, unreadMentions, pageThreads],
   );
 
+  useEffect(() => {
+    if (!panel) return;
+    document.documentElement.setAttribute('data-comments-open', '');
+    return () => document.documentElement.removeAttribute('data-comments-open');
+  }, [panel]);
+
   const activeThread = active ? threads.find((t) => t.id === active) ?? null : null;
   const showPins = mode || panel || !!activeThread;
 
@@ -209,7 +215,6 @@ export function CommentLayer({ children }: { children: ReactNode }) {
         {showPins && <Pins threads={pageThreads.filter((t) => !t.resolved_at || t.id === active)} active={active} onOpen={(c) => { setComposer(null); setActive(c.id === active ? null : c.id); }} />}
         {composer && <NewThread composer={composer} page={page} onClose={() => setComposer(null)} onPosted={(c) => { setComposer(null); setActive(c.id); }} />}
         {activeThread && <Thread thread={activeThread} onClose={() => setActive(null)} />}
-        {panel && <CommentPanel page={page} threads={threads} mentions={mentions} meId={session?.user.id ?? ''} onClose={() => setPanel(false)} onOpen={openThread} />}
       </div>
     </UiCtx.Provider>
   );
@@ -295,7 +300,10 @@ function Popover({ x, y, children, onClose, label }: { x: number; y: number; chi
     if (!el) return;
     const w = el.offsetWidth;
     const h = el.offsetHeight;
-    const left = Math.max(8, Math.min(x + 12, window.innerWidth - w - 8));
+    // keep clear of the docked comments column (desktop only; on phones it's a drawer)
+    const docked = window.innerWidth >= 1024 ? document.querySelector('[data-comment-sidebar]') : null;
+    const right = docked ? docked.getBoundingClientRect().left : window.innerWidth;
+    const left = Math.max(8, Math.min(x + 12, right - w - 8));
     const top = Math.max(8, Math.min(y + 12, window.innerHeight - h - 8));
     setPlace({ left, top });
   }, [x, y, children]);
@@ -482,6 +490,33 @@ function CommentItem({ c, people }: { c: Comment; people: Person[] }) {
 }
 
 // ─── the panel ───────────────────────────────────────────────────────────────
+/**
+ * The comments sidebar. The shell docks it on the right like the navigation on the
+ * left, so it pushes the page over instead of covering it; on phones it's a drawer.
+ */
+export function CommentSidebar() {
+  const { panel, setPanel, page, openThread } = useCommentUi();
+  const { comments, mentions } = useCollab();
+  const { session } = useAuth();
+  const threads = useMemo(() => comments.filter((c) => !c.parent_id), [comments]);
+  if (!panel) return null;
+  return (
+    <>
+      {/* below lg it's a drawer over the page, with a backdrop */}
+      <div className="fixed inset-0 z-40 bg-stone-950/40 lg:hidden" onClick={() => setPanel(false)} aria-hidden="true" data-comment-ui />
+      {/* from lg up it's a column beside the page, like the navigation on the left */}
+      <aside
+        aria-label="Comments"
+        data-comment-ui
+        data-comment-sidebar
+        className="fixed inset-y-0 right-0 z-40 flex w-full max-w-sm flex-col border-l border-stone-200 shadow-2xl dark:border-stone-800 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-80 lg:max-w-none lg:shrink-0 lg:shadow-none xl:w-96"
+      >
+        <CommentPanel page={page} threads={threads} mentions={mentions} meId={session?.user.id ?? ''} onClose={() => setPanel(false)} onOpen={openThread} />
+      </aside>
+    </>
+  );
+}
+
 type PanelTab = 'page' | 'all' | 'mentions';
 
 function CommentPanel({ page, threads, mentions, meId, onClose, onOpen }: {
@@ -513,10 +548,7 @@ function CommentPanel({ page, threads, mentions, meId, onClose, onOpen }: {
   };
 
   return (
-    <aside
-      aria-label="Comments"
-      className="fixed inset-y-0 right-0 z-40 flex w-full max-w-sm flex-col border-l border-stone-200 bg-white shadow-2xl dark:border-stone-800 dark:bg-stone-900"
-    >
+    <div className="flex h-full min-h-0 flex-col bg-white dark:bg-stone-900">
       <div className="flex items-center justify-between gap-2 border-b border-stone-100 px-4 py-3 dark:border-stone-800">
         <h2 className="font-serif text-xl font-semibold">Comments</h2>
         <IconButton label="Close comments" onClick={onClose}><IconX size={16} /></IconButton>
@@ -602,7 +634,7 @@ function CommentPanel({ page, threads, mentions, meId, onClose, onOpen }: {
           </ul>
         )}
       </div>
-    </aside>
+    </div>
   );
 }
 
