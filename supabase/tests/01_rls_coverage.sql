@@ -25,7 +25,8 @@ select is(
      join pg_tables t on t.schemaname = c.table_schema and t.tablename = c.table_name
     where c.table_schema = 'public' and c.column_name = 'wedding_id'
       and c.table_name not in ('memberships', 'invitations', 'activity_log', 'wedding_role_permissions',
-                               'comments', 'mentions', 'chat_categories', 'chat_channels', 'chat_messages', 'chat_reads')
+                               'comments', 'mentions', 'chat_categories', 'chat_channels', 'chat_messages', 'chat_reads',
+                               'chat_reactions', 'chat_files', 'chat_channel_notes', 'chat_saved')
       and c.table_name not in (select tbl from app.table_perms)),
   null,
   'every tenant table is registered in app.table_perms (so the policy loop covers it)'

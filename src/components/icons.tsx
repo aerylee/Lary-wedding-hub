@@ -83,3 +83,7 @@ export const IconMore = (p: P) => <Icon {...p}><circle cx="5" cy="12" r="1" /><c
 export const IconArchive = (p: P) => <Icon {...p}><rect x="3" y="4" width="18" height="4" rx="1" /><path d="M5 8v11h14V8M10 12h4" /></Icon>;
 export const IconFolder = (p: P) => <Icon {...p}><path d="M3 6h6l2 2h10v11H3V6Z" /></Icon>;
 export const IconList = (p: P) => <Icon {...p}><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></Icon>;
+export const IconBookmark = (p: P) => <Icon {...p}><path d="M6 3h12v18l-6-4-6 4V3Z" /></Icon>;
+export const IconStar = (p: P) => <Icon {...p}><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9L12 3Z" /></Icon>;
+export const IconImage = (p: P) => <Icon {...p}><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><path d="m21 17-5-5-9 8" /></Icon>;
+export const IconNote = (p: P) => <Icon {...p}><path d="M5 3h10l4 4v14H5V3Z" /><path d="M9 11h6M9 15h6M9 7h3" /></Icon>;

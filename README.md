@@ -6,7 +6,7 @@ A shared planning hub for a destination wedding: thirteen linked modules (dashbo
 - **Multi-tenant.** Every row belongs to one wedding; a person can belong to several with a different role in each.
 - **Dual currency.** Euro spend against a dollar ceiling, side by side.
 - **Editable roles.** Owners can change what each role may see and do, per wedding, from Account & team. The database enforces the edited matrix; owners always keep everything.
-- **Comments and team chat.** Comment mode (the speech-bubble button, or press C) pins a thread to anything on the page, with @mentions. Comments are only visible to people who can open that page. Team chat has channels in categories, threads, pins and unread counts.
+- **Comments and team chat.** Comment mode (the speech-bubble button, or press C) pins a thread to anything on the page, with @mentions. Comments are only visible to people who can open that page. Team chat is the hub's place for quick discussion, notes and files: channels in categories, threads, reactions, formatting (bold, lists, code, quotes), files and images (attach, drag in or paste a screenshot), a shared note per channel, pins, saved items, starred channels, search across messages, files and notes, a ⌘K channel switcher, drafts, typing indicators and unread counts (also in the browser tab).
 
 Mentions are stored in `public.mentions`, with an `emailed_at` column ready for the email notifications that come next. A notification can link to `/w/<wedding>/<page>?comment=<id>` to open the thread, or to `/w/<wedding>/chat?channel=<id>&message=<id>` for a chat message.
 
