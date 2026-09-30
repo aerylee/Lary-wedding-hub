@@ -43,7 +43,7 @@ export default function Settings() {
 
   return (
     <div>
-      <SectionTitle sub="The working date drives every countdown and task due date — move it and the whole plan moves with it.">Settings</SectionTitle>
+      <SectionTitle sub="The working date drives every countdown and task due date — move it and the whole plan moves with it.">Wedding settings</SectionTitle>
       <div className="grid gap-5 lg:grid-cols-2">
         <Panel>
           <PanelHead title="The couple & the date" />

@@ -54,7 +54,7 @@ export default function RunOfShow() {
     return (
       <div>
         <SectionTitle>Run of show</SectionTitle>
-        <Panel><Empty title="No events yet" body="The run of show is built from the weekend's events. Add them in Settings first." /></Panel>
+        <Panel><Empty title="No events yet" body="The run of show is built from the weekend's events. Add them in Wedding settings first." /></Panel>
       </div>
     );
   }

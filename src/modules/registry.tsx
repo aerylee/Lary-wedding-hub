@@ -27,7 +27,7 @@ export const TABS: TabDef[] = [
   { key: 'comms', label: 'Comms', perm: 'comms:read', icon: IconMail, component: lazy(() => import('./Comms')) },
   { key: 'legal', label: 'Legal', perm: 'legal:read', icon: IconScale, component: lazy(() => import('./Legal')) },
   { key: 'decisions', label: 'Decisions', perm: 'decisions:read', icon: IconFlag, component: lazy(() => import('./Decisions')) },
-  { key: 'settings', label: 'Settings', perm: 'settings:read', icon: IconSettings, component: lazy(() => import('./Settings')) },
+  { key: 'settings', label: 'Wedding settings', perm: 'settings:read', icon: IconSettings, component: lazy(() => import('./Settings')) },
 ];
 
 export const TAB_BY_KEY = new Map(TABS.map((t) => [t.key, t]));

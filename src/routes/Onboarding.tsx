@@ -43,13 +43,14 @@ export function Onboarding() {
         </p>
         <form onSubmit={create} className="mt-6 space-y-3 rounded-xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="One of you"><Input required value={a} onChange={(e) => setA(e.target.value)} placeholder="Rylee" /></Field>
-            <Field label="The other"><Input required value={b} onChange={(e) => setB(e.target.value)} placeholder="Laurel" /></Field>
+            <Field label="One of you"><Input required value={a} onChange={(e) => setA(e.target.value)} placeholder="First name" /></Field>
+            <Field label="The other"><Input required value={b} onChange={(e) => setB(e.target.value)} placeholder="First name" /></Field>
           </div>
           <Field label="Working wedding date" hint={`${dayOfWeek(date)}${isMidweek(date) ? ' — a midweek date; guests will need leave' : ''}. You can change it any time; the whole plan moves with it.`}>
             <Input type="date" required value={date} onChange={(e) => setDate(e.target.value)} />
           </Field>
           {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
+          {(!a.trim() || !b.trim()) && <p className="text-xs text-stone-500">Enter both names to continue.</p>}
           <Button type="submit" variant="primary" className="w-full" disabled={busy || !a.trim() || !b.trim()}>
             {busy ? 'Setting things up…' : 'Create the hub'}
           </Button>

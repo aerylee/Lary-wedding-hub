@@ -35,6 +35,7 @@ export const IconSun = (p: P) => <Icon {...p}><circle cx="12" cy="12" r="4" /><p
 export const IconMoon = (p: P) => <Icon {...p}><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></Icon>;
 export const IconChevronDown = (p: P) => <Icon {...p}><path d="m6 9 6 6 6-6" /></Icon>;
 export const IconChevronUp = (p: P) => <Icon {...p}><path d="m6 15 6-6 6 6" /></Icon>;
+export const IconChevronLeft = (p: P) => <Icon {...p}><path d="m15 6-6 6 6 6" /></Icon>;
 export const IconChevronRight = (p: P) => <Icon {...p}><path d="m9 6 6 6-6 6" /></Icon>;
 export const IconArrowUp = (p: P) => <Icon {...p}><path d="M12 19V5m0 0-6 6m6-6 6 6" /></Icon>;
 export const IconArrowDown = (p: P) => <Icon {...p}><path d="M12 5v14m0 0-6-6m6 6 6-6" /></Icon>;

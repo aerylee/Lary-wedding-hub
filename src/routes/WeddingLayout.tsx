@@ -7,11 +7,11 @@ import { StoreProvider, useStore } from '@/lib/store';
 import { chosenVenue, countdown } from '@/lib/derive';
 import { cls, fmtDateLong } from '@/lib/util';
 import { Banner, Button, Empty, Pill, Spinner } from '@/components/kit';
-import { IconChevronDown, IconLock, IconMenu, IconMoon, IconSun, IconX } from '@/components/icons';
+import { IconChevronDown, IconChevronLeft, IconChevronRight, IconHeart, IconLock, IconMenu, IconMoon, IconSun, IconX } from '@/components/icons';
 import { useTheme } from '@/components/theme';
 import { TABS, TAB_BY_KEY } from '@/modules/registry';
 import { FullScreen, Splash } from './Guards';
-import { Team } from './Team';
+import { AccountAndTeam } from './AccountAndTeam';
 
 const Assistant = lazy(() => import('@/modules/Assistant'));
 
@@ -59,12 +59,39 @@ function NoAccess({ onRetry }: { onRetry: () => void }) {
   );
 }
 
+const SIDEBAR_KEY = 'hub:sidebar-collapsed';
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 function Shell() {
   const { ready, loadError, settings, get } = useStore();
   const { can, role } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(readCollapsed);
   const loc = useLocation();
   useEffect(() => setMenuOpen(false), [loc.pathname]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false);
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, [menuOpen]);
+
+  const toggleCollapsed = () =>
+    setCollapsed((c) => {
+      try {
+        localStorage.setItem(SIDEBAR_KEY, c ? '0' : '1');
+      } catch {
+        /* only a convenience */
+      }
+      return !c;
+    });
 
   const tabs = TABS.filter((t) => can(t.perm));
   const { venue } = chosenVenue(get('venues'));
@@ -72,90 +99,131 @@ function Shell() {
   const couple = [settings.couple_a, settings.couple_b].filter(Boolean).join(' & ');
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-30 border-b border-stone-200 bg-stone-50/90 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5">
-          <button className="rounded-lg p-1.5 hover:bg-stone-200 dark:hover:bg-stone-800 lg:hidden" aria-label="Menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)}>
-            {menuOpen ? <IconX size={20} /> : <IconMenu size={20} />}
-          </button>
-          <div className="min-w-0 flex-1">
-            <div className="truncate font-serif text-xl font-semibold leading-tight">{couple || 'Our wedding'}</div>
-            <div className="truncate text-xs text-stone-500 dark:text-stone-400">
-              {fmtDateLong(settings.target_date)}
-              {!settings.date_is_firm && ' · date not final'}
-              {venue && ` · ${venue.name}`}
-            </div>
-          </div>
-          <div className="hidden text-right sm:block" title="Days until the wedding">
-            <div className="text-lg font-semibold tabular-nums leading-tight">{days >= 0 ? days : 0}</div>
-            <div className="text-[11px] uppercase tracking-wide text-stone-500">{days >= 0 ? 'days out' : 'married!'}</div>
-          </div>
-          <WeddingSwitcher />
-          <ThemeToggle />
-          <UserMenu />
-        </div>
-        <nav aria-label="Modules" className="mx-auto hidden max-w-7xl gap-1 overflow-x-auto px-3 pb-2 lg:flex">
-          {tabs.map((t) => (
-            <NavLink
-              key={t.key}
-              to={t.key}
-              className={({ isActive }) =>
-                cls(
-                  'inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium',
-                  isActive ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100',
-                )
-              }
-            >
-              <t.icon size={15} />
-              {t.label}
-            </NavLink>
-          ))}
-        </nav>
-        {menuOpen && (
-          <nav aria-label="Modules" className="grid grid-cols-2 gap-1 border-t border-stone-200 px-3 py-2 dark:border-stone-800 sm:grid-cols-3 lg:hidden">
-            {tabs.map((t) => (
-              <NavLink
-                key={t.key}
-                to={t.key}
-                className={({ isActive }) =>
-                  cls('flex items-center gap-2 rounded-lg px-3 py-2 text-sm', isActive ? 'bg-amber-100 font-medium text-amber-900 dark:bg-amber-900/40 dark:text-amber-200' : 'hover:bg-stone-200/60 dark:hover:bg-stone-800')
-                }
-              >
-                <t.icon size={16} />
-                {t.label}
-              </NavLink>
-            ))}
-          </nav>
+    <div className="min-h-screen lg:flex">
+      {/* desktop: a sticky left rail that collapses to icons */}
+      <aside
+        className={cls(
+          'sticky top-0 hidden h-screen shrink-0 flex-col border-r border-stone-200 bg-white transition-[width] duration-200 dark:border-stone-800 dark:bg-stone-900 lg:flex',
+          collapsed ? 'w-16' : 'w-60',
         )}
-      </header>
+      >
+        <SideNav tabs={tabs} collapsed={collapsed} onToggle={toggleCollapsed} />
+      </aside>
 
-      <main className="mx-auto max-w-7xl px-4 py-6">
-        {role === 'viewer' && <Banner tone="info">You have read-only access to this hub. Money and guest contact details are hidden.</Banner>}
-        {loadError ? (
-          <Empty title="The hub couldn't load" body={loadError} action={<Button onClick={() => window.location.reload()}>Try again</Button>} />
-        ) : !ready ? (
-          <div className="py-16"><Spinner label="Loading the plan…" /></div>
-        ) : (
-          <Suspense fallback={<div className="py-16"><Spinner /></div>}>
-            <Routes>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="team" element={can('members:manage') ? <Team /> : <NoPermission what="the team page" />} />
-              <Route path=":tab" element={<TabRoute />} />
-            </Routes>
-          </Suspense>
-        )}
-      </main>
+      {/* mobile: the same nav as a drawer from the left */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="absolute inset-0 bg-stone-950/40" onClick={() => setMenuOpen(false)} aria-hidden="true" />
+          <aside className="absolute inset-y-0 left-0 flex w-64 max-w-[85vw] flex-col bg-white shadow-xl dark:bg-stone-900">
+            <SideNav tabs={tabs} collapsed={false} onClose={() => setMenuOpen(false)} />
+          </aside>
+        </div>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <header className="sticky top-0 z-30 border-b border-stone-200 bg-stone-50/90 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
+          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5">
+            <button className="rounded-lg p-1.5 hover:bg-stone-200 dark:hover:bg-stone-800 lg:hidden" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
+              <IconMenu size={20} />
+            </button>
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-serif text-xl font-semibold leading-tight">{couple || 'Our wedding'}</div>
+              <div className="truncate text-xs text-stone-500 dark:text-stone-400">
+                {fmtDateLong(settings.target_date)}
+                {!settings.date_is_firm && ' · date not final'}
+                {venue && ` · ${venue.name}`}
+              </div>
+            </div>
+            <div className="hidden text-right sm:block" title="Days until the wedding">
+              <div className="text-lg font-semibold tabular-nums leading-tight">{days >= 0 ? days : 0}</div>
+              <div className="text-[11px] uppercase tracking-wide text-stone-500">{days >= 0 ? 'days out' : 'married!'}</div>
+            </div>
+            <WeddingSwitcher />
+            <ThemeToggle />
+            <UserMenu />
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-7xl px-4 py-6">
+          {role === 'viewer' && <Banner tone="info">You have read-only access to this hub. Money and guest contact details are hidden.</Banner>}
+          {loadError ? (
+            <Empty title="The hub couldn't load" body={loadError} action={<Button onClick={() => window.location.reload()}>Try again</Button>} />
+          ) : !ready ? (
+            <div className="py-16"><Spinner label="Loading the plan…" /></div>
+          ) : (
+            <Suspense fallback={<div className="py-16"><Spinner /></div>}>
+              <Routes>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="account" element={<AccountAndTeam />} />
+                <Route path="team" element={<Navigate to="../account" replace />} />
+                <Route path=":tab" element={<TabRoute />} />
+              </Routes>
+            </Suspense>
+          )}
+        </main>
+
+        <footer className="mx-auto max-w-7xl px-4 pb-10 pt-4 text-xs text-stone-500 dark:text-stone-500">
+          Benchmark figures — prices, lead times, document validity — are planning estimates, not quotes or legal advice. Check everything with the people who will actually do it.
+        </footer>
+      </div>
 
       {ready && can('assistant:use') && (
         <Suspense fallback={null}>
           <Assistant />
         </Suspense>
       )}
-
-      <footer className="mx-auto max-w-7xl px-4 pb-10 pt-4 text-xs text-stone-500 dark:text-stone-500">
-        Benchmark figures — prices, lead times, document validity — are planning estimates, not quotes or legal advice. Check everything with the people who will actually do it.
-      </footer>
     </div>
+  );
+}
+
+function SideNav({ tabs, collapsed, onToggle, onClose }: { tabs: typeof TABS; collapsed: boolean; onToggle?: () => void; onClose?: () => void }) {
+  return (
+    <>
+      <div className={cls('flex h-14 shrink-0 items-center border-b border-stone-100 dark:border-stone-800', collapsed ? 'justify-center px-2' : 'justify-between px-4')}>
+        {!collapsed && (
+          <span className="flex items-center gap-2 font-serif text-lg font-semibold">
+            <IconHeart size={16} className="text-amber-700" /> Wedding Hub
+          </span>
+        )}
+        {onToggle && (
+          <button
+            onClick={onToggle}
+            className="rounded-lg p-1.5 text-stone-500 hover:bg-stone-100 hover:text-stone-900 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+            title={collapsed ? 'Expand' : 'Collapse'}
+          >
+            {collapsed ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}
+          </button>
+        )}
+        {onClose && (
+          <button onClick={onClose} className="rounded-lg p-1.5 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="Close menu">
+            <IconX size={18} />
+          </button>
+        )}
+      </div>
+      <nav aria-label="Modules" className="flex-1 space-y-0.5 overflow-y-auto p-2">
+        {tabs.map((t) => (
+          <NavLink
+            key={t.key}
+            to={t.key}
+            title={collapsed ? t.label : undefined}
+            className={({ isActive }) =>
+              cls(
+                'flex items-center rounded-lg text-sm font-medium transition-colors',
+                collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2',
+                isActive
+                  ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200'
+                  : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100',
+              )
+            }
+          >
+            <t.icon size={collapsed ? 18 : 16} />
+            {!collapsed && <span className="truncate">{t.label}</span>}
+            {collapsed && <span className="sr-only">{t.label}</span>}
+          </NavLink>
+        ))}
+      </nav>
+    </>
   );
 }
 
@@ -210,7 +278,7 @@ function ThemeToggle() {
 }
 
 function UserMenu() {
-  const { profile, session, role, can, memberships, weddingId, signOut } = useAuth();
+  const { profile, session, role, memberships, weddingId, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -250,8 +318,7 @@ function UserMenu() {
             </div>
           )}
           <div className="py-1">
-            <MenuItem onClick={() => navigate('/account')}>Account</MenuItem>
-            {can('members:manage') && <MenuItem onClick={() => navigate(`/w/${weddingId}/team`)}>Team</MenuItem>}
+            <MenuItem onClick={() => navigate(`/w/${weddingId}/account`)}>Account &amp; team</MenuItem>
             <MenuItem onClick={() => navigate('/onboarding')}>Create another wedding</MenuItem>
             <MenuItem onClick={() => signOut()}>Sign out</MenuItem>
           </div>
