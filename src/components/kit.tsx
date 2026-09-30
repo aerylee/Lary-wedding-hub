@@ -123,9 +123,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   return disabled && title ? <span title={title} className="inline-flex">{btn}</span> : btn;
 });
 
-export function IconButton({ label, children, className, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string }) {
+export const IconButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & { label: string }>(function IconButton(
+  { label, children, className, ...rest },
+  ref,
+) {
   const btn = (
     <button
+      ref={ref}
       type="button"
       aria-label={label}
       title={label}
@@ -139,7 +143,7 @@ export function IconButton({ label, children, className, ...rest }: ButtonHTMLAt
     </button>
   );
   return rest.disabled ? <span title={label} className="inline-flex">{btn}</span> : btn;
-}
+});
 
 // ─── form fields ─────────────────────────────────────────────────────────────
 // a caller-supplied width (w-40, max-w-xs…) replaces the default full width
