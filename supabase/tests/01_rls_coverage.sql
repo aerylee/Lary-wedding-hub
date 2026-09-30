@@ -2,7 +2,7 @@
 -- The single highest-value test in the suite — a missing policy isn't an error, it's an
 -- empty table, and a missing `enable row level security` is a leak.
 begin;
-select plan(5);
+select plan(6);
 
 select is(
   (select array_agg(tablename::text order by tablename) from pg_tables
@@ -45,6 +45,15 @@ select is(
       and not exists (select 1 from unnest(coalesce(p.proconfig, '{}')) c where c like 'search_path=%')),
   null,
   'every SECURITY DEFINER function pins its search_path'
+);
+
+select is(
+  (select array_agg(p.proname::text order by p.proname)
+     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'app'
+      and not exists (select 1 from unnest(coalesce(p.proconfig, '{}')) c where c like 'search_path=%')),
+  null,
+  'every function in the app schema pins its search_path'
 );
 
 select * from finish();

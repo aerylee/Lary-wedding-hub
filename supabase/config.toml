@@ -62,8 +62,10 @@ verify_jwt = true
 [functions.send-invite]
 verify_jwt = true
 
+# Called by pg_cron, not by users. They check the service-role key themselves, so the
+# gateway's JWT check is off (the newer sb_secret_ keys aren't JWTs).
 [functions.fx-refresh]
-verify_jwt = true
+verify_jwt = false
 
 [functions.purge-attachments]
-verify_jwt = true
+verify_jwt = false
