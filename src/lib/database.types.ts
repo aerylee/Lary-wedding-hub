@@ -391,6 +391,52 @@ export type Database = {
           },
         ]
       }
+      chat_channel_notes: {
+        Row: {
+          body: string
+          channel_id: string
+          updated_at: string
+          updated_by: string | null
+          wedding_id: string
+        }
+        Insert: {
+          body?: string
+          channel_id: string
+          updated_at?: string
+          updated_by?: string | null
+          wedding_id: string
+        }
+        Update: {
+          body?: string
+          channel_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_channel_notes_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_channel_notes_wedding_id_channel_id_fkey"
+            columns: ["wedding_id", "channel_id"]
+            isOneToOne: false
+            referencedRelation: "chat_channels"
+            referencedColumns: ["wedding_id", "id"]
+          },
+          {
+            foreignKeyName: "chat_channel_notes_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_channels: {
         Row: {
           archived_at: string | null
@@ -446,6 +492,80 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "weddings"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_files: {
+        Row: {
+          channel_id: string
+          created_at: string
+          height: number | null
+          id: string
+          message_id: string
+          mime: string
+          name: string
+          size: number
+          storage_path: string
+          uploaded_by: string | null
+          wedding_id: string
+          width: number | null
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          height?: number | null
+          id?: string
+          message_id: string
+          mime?: string
+          name: string
+          size: number
+          storage_path: string
+          uploaded_by?: string | null
+          wedding_id: string
+          width?: number | null
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          height?: number | null
+          id?: string
+          message_id?: string
+          mime?: string
+          name?: string
+          size?: number
+          storage_path?: string
+          uploaded_by?: string | null
+          wedding_id?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_files_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_files_wedding_id_channel_id_fkey"
+            columns: ["wedding_id", "channel_id"]
+            isOneToOne: false
+            referencedRelation: "chat_channels"
+            referencedColumns: ["wedding_id", "id"]
+          },
+          {
+            foreignKeyName: "chat_files_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_files_wedding_id_message_id_fkey"
+            columns: ["wedding_id", "message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["wedding_id", "id"]
           },
         ]
       }
@@ -517,22 +637,71 @@ export type Database = {
           },
         ]
       }
+      chat_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          message_id: string
+          user_id: string
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          message_id: string
+          user_id?: string
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          message_id?: string
+          user_id?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_reactions_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_reactions_wedding_id_message_id_fkey"
+            columns: ["wedding_id", "message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["wedding_id", "id"]
+          },
+        ]
+      }
       chat_reads: {
         Row: {
           channel_id: string
           last_read_at: string
+          starred: boolean
           user_id: string
           wedding_id: string
         }
         Insert: {
           channel_id: string
           last_read_at?: string
+          starred?: boolean
           user_id?: string
           wedding_id: string
         }
         Update: {
           channel_id?: string
           last_read_at?: string
+          starred?: boolean
           user_id?: string
           wedding_id?: string
         }
@@ -557,6 +726,49 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "weddings"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_saved: {
+        Row: {
+          created_at: string
+          message_id: string
+          user_id: string
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          message_id: string
+          user_id?: string
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          message_id?: string
+          user_id?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_saved_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_saved_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_saved_wedding_id_message_id_fkey"
+            columns: ["wedding_id", "message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["wedding_id", "id"]
           },
         ]
       }

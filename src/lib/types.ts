@@ -38,6 +38,10 @@ export type ChatCategory = Tables<'chat_categories'>;
 export type ChatChannel = Tables<'chat_channels'>;
 export type ChatMessage = Tables<'chat_messages'>;
 export type ChatRead = Tables<'chat_reads'>;
+export type ChatReaction = Tables<'chat_reactions'>;
+export type ChatFile = Tables<'chat_files'>;
+export type ChatNote = Tables<'chat_channel_notes'>;
+export type ChatSaved = Tables<'chat_saved'>;
 
 export type VenueStatus = Enums<'venue_status'>;
 export type TaskStatus = Enums<'task_status'>;

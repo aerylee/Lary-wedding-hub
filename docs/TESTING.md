@@ -16,7 +16,8 @@ Untested row-level security is decoration. A missing policy isn't an error; it's
 8. A removed member's live session reads nothing on its very next query.
 9. Per-wedding role changes are enforced (grant the budget to collaborators and they see it; take venue edits away and inserts fail), only owners can edit the matrix, and nobody can remove owners' permissions or hand out team management.
 10. Comments are as private as their page: a collaborator can't read or post budget comments, a mention of someone who can't see the page is dropped, only authors edit their words, and replies can't move to another page. Anyone in the chat can post; viewers can't create channels; outsiders read nothing.
-11. Every public table has RLS enabled and a full set of policies, every tenant table is registered in `app.table_perms`, and every `SECURITY DEFINER` function pins its `search_path`.
+11. Chat hub: only people who can post can react (and only as themselves); a viewer who can post can upload into the chat folder but still not other attachments; file rows can't point outside their wedding's chat folder; outsiders see no chat files, notes or reactions; saved items and stars are private; deleting a message removes its files and queues their storage for purge.
+12. Every public table has RLS enabled and a full set of policies, every tenant table is registered in `app.table_perms`, and every `SECURITY DEFINER` function pins its `search_path`.
 
 The unit suite (`npm test`) covers the budget/headcount/validity maths, CSV, address parsing, `.eml` decoding, vendor matching, and the server-side evidence check that backs "never guess".
 

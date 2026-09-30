@@ -27,3 +27,15 @@
 @media (min-width: 1280px) {
   [data-comments-open] .assistant-dock { right: calc(24rem + 1.25rem); }
 }
+
+/* an indeterminate progress sliver (file uploads) */
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+/* a message you jumped to glows briefly */
+@keyframes flash {
+  0%, 30% { background-color: rgb(253 230 138 / 0.6); }
+  100% { background-color: transparent; }
+}
+.animate-flash { animation: flash 2s ease-out; }

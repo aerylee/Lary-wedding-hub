@@ -1,7 +1,7 @@
 // A textarea that completes @names from the team, and the renderer that shows them.
 // A mention is stored twice: as "@Name" in the text people read, and as a user id in
 // `mentions`, which is what the database notifies.
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState, type ClipboardEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { cls } from '@/lib/util';
 
 export type Person = { id: string; name: string; email: string };
@@ -19,18 +19,23 @@ type Props = {
   disabled?: boolean;
   className?: string;
   ariaLabel?: string;
+  onPaste?: (e: ClipboardEvent<HTMLTextAreaElement>) => void;
+  /** runs before the built-in keys (when no name list is open); return true if handled */
+  onKeyDownExtra?: (e: KeyboardEvent<HTMLTextAreaElement>) => boolean;
+  /** no border or background of its own, for use inside a styled box */
+  bare?: boolean;
 };
 
-export type MentionInputHandle = { focus: () => void };
+export type MentionInputHandle = { focus: () => void; el: () => HTMLTextAreaElement | null };
 
 export const MentionInput = forwardRef<MentionInputHandle, Props>(function MentionInput(
-  { value, onChange, people, onSubmit, enterSends, placeholder, rows = 2, autoFocus, disabled, className, ariaLabel },
+  { value, onChange, people, onSubmit, enterSends, placeholder, rows = 2, autoFocus, disabled, className, ariaLabel, onPaste, onKeyDownExtra, bare },
   ref,
 ) {
   const ta = useRef<HTMLTextAreaElement>(null);
   const [query, setQuery] = useState<string | null>(null);
   const [active, setActive] = useState(0);
-  useImperativeHandle(ref, () => ({ focus: () => ta.current?.focus() }));
+  useImperativeHandle(ref, () => ({ focus: () => ta.current?.focus(), el: () => ta.current }));
 
   const matches = useMemo(() => {
     if (query === null) return [];
@@ -65,6 +70,7 @@ export const MentionInput = forwardRef<MentionInputHandle, Props>(function Menti
       if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); pick(matches[active]); return; }
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setQuery(null); return; }
     }
+    if (onKeyDownExtra?.(e)) return;
     if (e.key === 'Enter' && onSubmit) {
       const send = enterSends ? !e.shiftKey : e.metaKey || e.ctrlKey;
       if (send) {
@@ -89,10 +95,13 @@ export const MentionInput = forwardRef<MentionInputHandle, Props>(function Menti
           detect(e.target.value, e.target.selectionStart);
         }}
         onKeyDown={onKeyDown}
+        onPaste={onPaste}
         onClick={(e) => detect(value, (e.target as HTMLTextAreaElement).selectionStart)}
         onBlur={() => setTimeout(() => setQuery(null), 150)}
         className={cls(
-          'w-full resize-y rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 disabled:bg-stone-50 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100',
+          bare
+            ? 'block w-full resize-none bg-transparent px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none disabled:opacity-60 dark:text-stone-100'
+            : 'w-full resize-y rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 disabled:bg-stone-50 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100',
           className,
         )}
       />
