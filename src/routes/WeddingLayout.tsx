@@ -11,7 +11,7 @@ import { Banner, Button, Empty, Pill, Spinner } from '@/components/kit';
 import {
   IconChat, IconChevronDown, IconChevronLeft, IconChevronRight, IconHeart, IconLock, IconMenu, IconMessage, IconMessagePlus, IconMoon, IconSun, IconX,
 } from '@/components/icons';
-import { CommentLayer, useCommentUi } from '@/components/comments/CommentLayer';
+import { CommentLayer, CommentSidebar, useCommentUi } from '@/components/comments/CommentLayer';
 import { useTheme } from '@/components/theme';
 import { TABS, TAB_BY_KEY } from '@/modules/registry';
 import { FullScreen, Splash } from './Guards';
@@ -185,6 +185,8 @@ function Shell() {
           Benchmark figures — prices, lead times, document validity — are planning estimates, not quotes or legal advice. Check everything with the people who will actually do it.
         </footer>
       </div>
+
+      <CommentSidebar />
 
       {/* the chat has its own composer where the assistant's button would sit */}
       {ready && can('assistant:use') && !loc.pathname.endsWith('/chat') && (

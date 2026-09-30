@@ -114,14 +114,14 @@ export default function Assistant() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-amber-700 px-4 py-3 text-sm font-medium text-white shadow-lg hover:bg-amber-800"
+          className="assistant-dock fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-amber-700 px-4 py-3 text-sm font-medium text-white shadow-lg hover:bg-amber-800"
         >
           <IconSparkles size={16} /> Ask the hub
           {proposals.length > 0 && <span className="rounded-full bg-white px-1.5 text-xs text-amber-800">{proposals.length}</span>}
         </button>
       )}
       {open && (
-        <div role="dialog" aria-label="Assistant" className="fixed inset-x-0 bottom-0 z-40 flex h-[80vh] flex-col border-t border-stone-200 bg-white shadow-2xl dark:border-stone-800 dark:bg-stone-900 sm:inset-x-auto sm:bottom-5 sm:right-5 sm:h-[36rem] sm:w-[26rem] sm:rounded-2xl sm:border">
+        <div role="dialog" aria-label="Assistant" className="assistant-dock fixed inset-x-0 bottom-0 z-40 flex h-[80vh] flex-col border-t border-stone-200 bg-white shadow-2xl dark:border-stone-800 dark:bg-stone-900 sm:inset-x-auto sm:bottom-5 sm:right-5 sm:h-[36rem] sm:w-[26rem] sm:rounded-2xl sm:border">
           <div className="flex items-center justify-between border-b border-stone-100 px-4 py-2.5 dark:border-stone-800">
             <div className="flex items-center gap-2 font-serif text-lg font-semibold"><IconSparkles size={16} className="text-amber-700" /> Assistant</div>
             <IconButton label="Close assistant" onClick={() => setOpen(false)}><IconX /></IconButton>
