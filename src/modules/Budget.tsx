@@ -12,7 +12,7 @@ import {
 } from '@/components/kit';
 import { CanButton, whyNot } from '@/components/Gate';
 import { EditorFooter, useEditor } from '@/components/editor';
-import { IconArrowDown, IconArrowUp, IconGrip, IconPencil, IconPlus, IconTrash } from '@/components/icons';
+import { IconArrowDown, IconArrowUp, IconChevronDown, IconChevronRight, IconChevronUp, IconGrip, IconPencil, IconPlus, IconTrash } from '@/components/icons';
 import { CsvButton, Grid, usePlan } from './common';
 
 type Tab = 'lines' | 'payments' | 'whatif';
@@ -161,22 +161,70 @@ function HeaderControls() {
 }
 
 // ─── line items ──────────────────────────────────────────────────────────────
+// each category gets its own colour, so the groups read as groups at a glance
+const CAT_TONES = [
+  { stripe: 'border-l-amber-500', dot: 'bg-amber-500', head: 'bg-amber-50/80 dark:bg-amber-950/30' },
+  { stripe: 'border-l-sky-500', dot: 'bg-sky-500', head: 'bg-sky-50/80 dark:bg-sky-950/30' },
+  { stripe: 'border-l-emerald-500', dot: 'bg-emerald-500', head: 'bg-emerald-50/80 dark:bg-emerald-950/30' },
+  { stripe: 'border-l-violet-500', dot: 'bg-violet-500', head: 'bg-violet-50/80 dark:bg-violet-950/30' },
+  { stripe: 'border-l-rose-500', dot: 'bg-rose-500', head: 'bg-rose-50/80 dark:bg-rose-950/30' },
+  { stripe: 'border-l-teal-500', dot: 'bg-teal-500', head: 'bg-teal-50/80 dark:bg-teal-950/30' },
+  { stripe: 'border-l-orange-500', dot: 'bg-orange-500', head: 'bg-orange-50/80 dark:bg-orange-950/30' },
+  { stripe: 'border-l-indigo-500', dot: 'bg-indigo-500', head: 'bg-indigo-50/80 dark:bg-indigo-950/30' },
+];
+const NONE_TONE = { stripe: 'border-l-stone-400', dot: 'bg-stone-400', head: 'bg-stone-100 dark:bg-stone-800/60' };
+
+function useCollapsed(weddingId: string) {
+  const key = `hub:budget-collapsed:${weddingId}`;
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(key) ?? '[]') as string[]);
+    } catch {
+      return new Set();
+    }
+  });
+  const save = (next: Set<string>) => {
+    setCollapsed(next);
+    try {
+      localStorage.setItem(key, JSON.stringify([...next]));
+    } catch {
+      /* only a convenience */
+    }
+  };
+  return [collapsed, save] as const;
+}
+
 function Lines({ lines, categories, vendors, onManage }: { lines: BudgetLine[]; categories: BudgetCategory[]; vendors: { id: string; name: string }[]; onManage: () => void }) {
   const { headcount, fx } = usePlan();
+  const { weddingId } = useStore();
   const ed = useEditor<BudgetLine>('budget_lines', blankLine);
+  const [collapsed, setCollapsed] = useCollapsed(weddingId);
   const catIds = new Set(categories.map((c) => c.id));
   const sections = [
-    ...categories.map((c) => ({ key: c.id, name: c.name, rows: lines.filter((l) => l.category_id === c.id) })),
-    { key: '__none', name: 'Uncategorised', rows: lines.filter((l) => !l.category_id || !catIds.has(l.category_id)) },
+    ...categories.map((c, i) => ({ key: c.id, name: c.name, tone: CAT_TONES[i % CAT_TONES.length], rows: lines.filter((l) => l.category_id === c.id) })),
+    { key: '__none', name: 'Uncategorised', tone: NONE_TONE, rows: lines.filter((l) => !l.category_id || !catIds.has(l.category_id)) },
   ].filter((s) => s.rows.length || s.key !== '__none');
+  const grand = lines.reduce((a, l) => a + lineEur(l, headcount, fx).best, 0);
+  const allCollapsed = sections.every((s) => collapsed.has(s.key));
+  const toggle = (key: string) => {
+    const next = new Set(collapsed);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    setCollapsed(next);
+  };
 
   return (
     <Panel>
       <PanelHead
         title="Line items"
-        sub="The plan runs on contracted, else quoted, else the estimate."
+        sub="Grouped by category. The plan runs on contracted, else quoted, else the estimate."
         actions={
           <>
+            {lines.length > 0 && (
+              <Button size="sm" variant="subtle" onClick={() => setCollapsed(allCollapsed ? new Set() : new Set(sections.map((s) => s.key)))}>
+                {allCollapsed ? <IconChevronDown size={14} /> : <IconChevronUp size={14} />} {allCollapsed ? 'Expand all' : 'Collapse all'}
+              </Button>
+            )}
             <CanButton perm="finance:write" size="sm" onClick={onManage}>Categories</CanButton>
             <CanButton perm="finance:write" size="sm" variant="primary" onClick={() => ed.open()}><IconPlus size={14} /> Add line</CanButton>
           </>
@@ -185,52 +233,107 @@ function Lines({ lines, categories, vendors, onManage }: { lines: BudgetLine[]; 
       {lines.length === 0 ? (
         <Empty title="No budget lines yet" body="Start with the venue — everything else scales off it." action={<CanButton perm="finance:write" variant="primary" onClick={() => ed.open()}>Add a line</CanButton>} />
       ) : (
-        <TWrap>
-          <thead>
-            <tr>
-              <TH>Line</TH><TH align="right">Estimate</TH><TH align="right">Quoted</TH><TH align="right">Contracted</TH>
-              <TH align="right">Paid</TH><TH align="right">Plan (€)</TH><TH>Funded by</TH>
-            </tr>
-          </thead>
-          <tbody>
-            {sections.map((s) => {
-              const subtotal = s.rows.reduce((a, l) => a + lineEur(l, headcount, fx).best, 0);
-              return [
-                <tr key={`h-${s.key}`} className="bg-stone-50/70 dark:bg-stone-900/70">
-                  <TD colSpan={5} className="font-semibold">{s.name}</TD>
-                  <TD align="right" className="font-semibold"><WithUsd eurAmount={subtotal} fx={fx} /></TD>
-                  <TD />
-                </tr>,
-                ...(s.rows.length === 0
-                  ? [<tr key={`e-${s.key}`}><TD colSpan={7} className="text-xs text-stone-400">No lines in this category.</TD></tr>]
-                  : sortBy(s.rows, (l) => -lineEur(l, headcount, fx).best).map((l) => {
-                      const r = lineEur(l, headcount, fx);
-                      // euro figures get their dollar equivalent underneath; dollar lines are already in USD
-                      const m = (v: number | null) => (v === null ? '—' : l.currency === 'EUR' ? <WithUsd eurAmount={v} fx={fx} /> : fmtMoney(v, l.currency));
-                      return (
-                        <TR key={l.id} onClick={() => ed.open(l)}>
-                          <TD>
-                            <div>{l.label}</div>
-                            <div className="flex flex-wrap gap-1 pt-0.5">
-                              {l.per_guest && <Pill tone="info">per guest × {headcount}</Pill>}
-                              {l.currency === 'USD' && <Pill>USD</Pill>}
-                              {r.isFirm && <Pill tone="good">firm</Pill>}
-                              {l.vendor_id && <Pill tone="muted">{vendors.find((v) => v.id === l.vendor_id)?.name ?? 'vendor'}</Pill>}
-                            </div>
-                          </TD>
-                          <TD align="right">{m(num(l.estimate_eur))}</TD>
-                          <TD align="right">{m(l.quoted_eur === null ? null : num(l.quoted_eur))}</TD>
-                          <TD align="right">{m(l.contracted_eur === null ? null : num(l.contracted_eur))}</TD>
-                          <TD align="right">{m(num(l.paid_eur))}</TD>
-                          <TD align="right" className="font-medium"><WithUsd eurAmount={r.best} fx={fx} /></TD>
-                          <TD className="text-stone-500">{l.funded_by}</TD>
-                        </TR>
-                      );
-                    })),
-              ];
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[820px] table-fixed border-separate border-spacing-0 text-sm">
+            <colgroup>
+              <col />
+              <col className="w-28" /><col className="w-28" /><col className="w-28" /><col className="w-28" /><col className="w-32" /><col className="w-32" />
+            </colgroup>
+            <thead>
+              <tr>
+                <TH>Line</TH><TH align="right">Estimate</TH><TH align="right">Quoted</TH><TH align="right">Contracted</TH>
+                <TH align="right">Paid</TH><TH align="right">Plan (€)</TH><TH>Funded by</TH>
+              </tr>
+            </thead>
+            {sections.map((s, si) => {
+              const figures = s.rows.map((l) => lineEur(l, headcount, fx));
+              const subtotal = figures.reduce((a, r) => a + r.best, 0);
+              const estimate = figures.reduce((a, r) => a + r.estimate, 0);
+              const paid = figures.reduce((a, r) => a + r.paid, 0);
+              const firm = figures.filter((r) => r.isFirm).length;
+              const isCollapsed = collapsed.has(s.key);
+              const share = grand ? subtotal / grand : 0;
+              return (
+                <tbody key={s.key}>
+                  {si > 0 && <tr aria-hidden="true"><td colSpan={7} className="h-3 p-0" /></tr>}
+                  <tr className={cls(s.tone.head)}>
+                    <td colSpan={4} className={cls('border-y border-l-4 border-y-stone-200 px-3 py-2.5 dark:border-y-stone-700', s.tone.stripe)}>
+                      <button
+                        type="button"
+                        onClick={() => toggle(s.key)}
+                        aria-expanded={!isCollapsed}
+                        className="flex w-full items-center gap-2 text-left"
+                      >
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white/80 text-stone-600 shadow-sm ring-1 ring-stone-200 dark:bg-stone-900 dark:text-stone-300 dark:ring-stone-700">
+                          {isCollapsed ? <IconChevronRight size={14} /> : <IconChevronDown size={14} />}
+                        </span>
+                        <span className="font-serif text-base font-semibold text-stone-900 dark:text-stone-50">{s.name}</span>
+                        <span className="rounded-full bg-white/80 px-2 py-0.5 text-[11px] font-medium text-stone-600 ring-1 ring-stone-200 dark:bg-stone-900 dark:text-stone-300 dark:ring-stone-700">
+                          {s.rows.length} {s.rows.length === 1 ? 'line' : 'lines'}{firm > 0 && ` · ${firm} firm`}
+                        </span>
+                        <span className="ml-auto hidden items-center gap-2 text-xs text-stone-500 sm:flex">
+                          <span className="h-1.5 w-20 overflow-hidden rounded-full bg-white/80 ring-1 ring-stone-200 dark:bg-stone-900 dark:ring-stone-700">
+                            <span className={cls('block h-full rounded-full', s.tone.dot)} style={{ width: `${Math.round(share * 100)}%` }} />
+                          </span>
+                          <span className="w-10 text-right tabular-nums">{pct(share)}</span>
+                        </span>
+                      </button>
+                    </td>
+                    <td className="border-y border-y-stone-200 px-3 py-2.5 text-right tabular-nums text-stone-600 dark:border-y-stone-700 dark:text-stone-300">
+                      {paid > 0 ? <WithUsd eurAmount={paid} fx={fx} /> : <span className="text-stone-400">—</span>}
+                    </td>
+                    <td className="border-y border-y-stone-200 px-3 py-2.5 text-right font-semibold tabular-nums dark:border-y-stone-700">
+                      <WithUsd eurAmount={subtotal} fx={fx} />
+                    </td>
+                    <td className="border-y border-r border-stone-200 px-3 py-2.5 text-xs text-stone-500 dark:border-stone-700">
+                      {estimate !== subtotal && <span title="What the estimates alone add up to">est. {eur(estimate)}</span>}
+                    </td>
+                  </tr>
+                  {!isCollapsed &&
+                    (s.rows.length === 0 ? (
+                      <tr><td colSpan={7} className={cls('border-b border-l-4 border-b-stone-100 px-3 py-2 text-xs text-stone-400 dark:border-b-stone-800', s.tone.stripe)}>No lines in this category.</td></tr>
+                    ) : (
+                      sortBy(s.rows, (l) => -lineEur(l, headcount, fx).best).map((l) => {
+                        const r = lineEur(l, headcount, fx);
+                        // euro figures get their dollar equivalent underneath; dollar lines are already in USD
+                        const m = (v: number | null) => (v === null ? '—' : l.currency === 'EUR' ? <WithUsd eurAmount={v} fx={fx} /> : fmtMoney(v, l.currency));
+                        return (
+                          <TR key={l.id} commentKey={l.id} onClick={() => ed.open(l)}>
+                            <TD className={cls('border-l-4 pl-4', s.tone.stripe)}>
+                              <div>{l.label}</div>
+                              <div className="flex flex-wrap gap-1 pt-0.5">
+                                {l.per_guest && <Pill tone="info">per guest × {headcount}</Pill>}
+                                {l.currency === 'USD' && <Pill>USD</Pill>}
+                                {r.isFirm && <Pill tone="good">firm</Pill>}
+                                {l.vendor_id && <Pill tone="muted">{vendors.find((v) => v.id === l.vendor_id)?.name ?? 'vendor'}</Pill>}
+                              </div>
+                            </TD>
+                            <TD align="right">{m(num(l.estimate_eur))}</TD>
+                            <TD align="right">{m(l.quoted_eur === null ? null : num(l.quoted_eur))}</TD>
+                            <TD align="right">{m(l.contracted_eur === null ? null : num(l.contracted_eur))}</TD>
+                            <TD align="right">{m(num(l.paid_eur))}</TD>
+                            <TD align="right" className="font-medium"><WithUsd eurAmount={r.best} fx={fx} /></TD>
+                            <TD className="text-stone-500">{l.funded_by}</TD>
+                          </TR>
+                        );
+                      })
+                    ))}
+                </tbody>
+              );
             })}
-          </tbody>
-        </TWrap>
+            <tbody>
+              <tr aria-hidden="true"><td colSpan={7} className="h-3 p-0" /></tr>
+              <tr className="bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900">
+                <td colSpan={5} className="rounded-l-lg px-3 py-2.5 font-semibold">Total plan</td>
+                <td className="px-3 py-2.5 text-right font-semibold tabular-nums">
+                  <div>{eur(grand)}</div>
+                  <div className="text-[11px] font-normal opacity-70">{usd(grand * fx)}</div>
+                </td>
+                <td className="rounded-r-lg px-3 py-2.5" />
+              </tr>
+            </tbody>
+          </table>
+        </div>
       )}
 
       <Modal open={!!ed.draft} title={ed.isNew ? 'Add budget line' : 'Edit budget line'} onClose={ed.close} footer={<EditorFooter ed={ed} coll="budget_lines" />} wide>
@@ -320,7 +423,7 @@ function Payments({ payments, lines, vendors }: { payments: Payment[]; lines: Bu
               const d = daysUntil(p.due_date);
               const overdue = !p.paid_date && d !== null && d < 0;
               return (
-                <TR key={p.id} onClick={() => ed.open(p)} className={cls(overdue && 'bg-rose-50/60 dark:bg-rose-950/30')}>
+                <TR key={p.id} commentKey={p.id} onClick={() => ed.open(p)} className={cls(overdue && 'bg-rose-50/60 dark:bg-rose-950/30')}>
                   <TD>
                     <div>{p.label}</div>
                     <div className="text-xs text-stone-500">{[lines.find((l) => l.id === p.line_id)?.label, vendors.find((v) => v.id === p.vendor_id)?.name].filter(Boolean).join(' · ')}</div>

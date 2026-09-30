@@ -9,11 +9,14 @@ import { addDays, cls, daysBetween, fmtDate, groupBy, matches, relativeDays, sor
 import { Area, Bar, Check, Empty, Field, Input, Modal, NumberInput, Panel, Pill, SearchInput, Segmented, Select, SectionTitle, Stat, StatGrid } from '@/components/kit';
 import { CanButton, whyNot } from '@/components/Gate';
 import { EditorFooter, useEditor } from '@/components/editor';
-import { IconPlus } from '@/components/icons';
+import { IconCalendar, IconList, IconPlus } from '@/components/icons';
 import { CsvButton, Grid, Toolbar } from './common';
+import { TimelineCalendar } from './TimelineCalendar';
 
 type Filter = 'open' | 'overdue' | 'soon' | 'key' | 'all';
 type GroupBy = 'phase' | 'category' | 'owner';
+type View = 'list' | 'calendar';
+const VIEW_KEY = 'hub:timeline-view';
 
 const NEXT: Record<TaskStatus, TaskStatus> = { todo: 'doing', doing: 'done', done: 'na', na: 'todo' };
 const STATUS_LABEL: Record<TaskStatus, string> = { todo: 'To do', doing: 'Doing', done: 'Done', na: 'N/A' };
@@ -31,6 +34,21 @@ export default function Timeline() {
   const [filter, setFilter] = useState<Filter>('open');
   const [group, setGroup] = useState<GroupBy>('phase');
   const [q, setQ] = useState('');
+  const [view, setViewRaw] = useState<View>(() => {
+    try {
+      return localStorage.getItem(VIEW_KEY) === 'calendar' ? 'calendar' : 'list';
+    } catch {
+      return 'list';
+    }
+  });
+  const setView = (v: View) => {
+    setViewRaw(v);
+    try {
+      localStorage.setItem(VIEW_KEY, v);
+    } catch {
+      /* only a convenience */
+    }
+  };
   const ed = useEditor<Task>('tasks', blank);
   const canWrite = can('tasks:write');
 
@@ -97,6 +115,14 @@ export default function Timeline() {
       <Bar value={sum.pct} tone="good" className="mb-5" label="Overall progress" />
 
       <Toolbar>
+        <Segmented<View>
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'list', label: <span className="inline-flex items-center gap-1.5"><IconList size={14} /> List</span> },
+            { value: 'calendar', label: <span className="inline-flex items-center gap-1.5"><IconCalendar size={14} /> Calendar</span> },
+          ]}
+        />
         <Segmented<Filter>
           value={filter}
           onChange={setFilter}
@@ -108,16 +134,25 @@ export default function Timeline() {
             { value: 'all', label: 'All', count: counts.all },
           ]}
         />
-        <Segmented<GroupBy>
+        {view === 'list' && <Segmented<GroupBy>
           size="sm"
           value={group}
           onChange={setGroup}
           options={[{ value: 'phase', label: 'By phase' }, { value: 'category', label: 'By area' }, { value: 'owner', label: 'By owner' }]}
-        />
+        />}
         <div className="ml-auto"><SearchInput value={q} onChange={setQ} placeholder="Search tasks…" /></div>
       </Toolbar>
 
-      {visible.length === 0 ? (
+      {view === 'calendar' ? (
+        <TimelineCalendar
+          tasks={visible}
+          onOpen={(t) => ed.open(t)}
+          onAdd={(date) => {
+            ed.open();
+            ed.patch({ offset_days: daysBetween(date, settings.target_date) });
+          }}
+        />
+      ) : visible.length === 0 ? (
         <Panel>
           <Empty
             title={tasks.length === 0 ? 'No tasks yet' : 'Nothing matches'}
@@ -199,7 +234,7 @@ export default function Timeline() {
 
 function TaskRow({ t, s, canWrite, onCycle, onOpen }: { t: Task; s: TaskState; canWrite: boolean; onCycle: () => void; onOpen: () => void }) {
   return (
-    <li className="flex items-start gap-3 px-4 py-2.5">
+    <li className="flex items-start gap-3 px-4 py-2.5" data-comment-key={t.id}>
       <button
         onClick={onCycle}
         disabled={!canWrite}

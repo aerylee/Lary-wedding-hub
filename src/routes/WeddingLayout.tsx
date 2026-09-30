@@ -4,16 +4,21 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth, ROLE_LABEL } from '@/lib/auth';
 import { StoreProvider, useStore } from '@/lib/store';
+import { CollabProvider, useCollab } from '@/lib/collab';
 import { chosenVenue, countdown } from '@/lib/derive';
 import { cls, fmtDateLong } from '@/lib/util';
 import { Banner, Button, Empty, Pill, Spinner } from '@/components/kit';
-import { IconChevronDown, IconChevronLeft, IconChevronRight, IconHeart, IconLock, IconMenu, IconMoon, IconSun, IconX } from '@/components/icons';
+import {
+  IconChat, IconChevronDown, IconChevronLeft, IconChevronRight, IconHeart, IconLock, IconMenu, IconMessage, IconMessagePlus, IconMoon, IconSun, IconX,
+} from '@/components/icons';
+import { CommentLayer, useCommentUi } from '@/components/comments/CommentLayer';
 import { useTheme } from '@/components/theme';
 import { TABS, TAB_BY_KEY } from '@/modules/registry';
 import { FullScreen, Splash } from './Guards';
 import { AccountAndTeam } from './AccountAndTeam';
 
 const Assistant = lazy(() => import('@/modules/Assistant'));
+const Chat = lazy(() => import('@/modules/Chat'));
 
 export function WeddingLayout() {
   const { weddingId = '' } = useParams();
@@ -30,7 +35,11 @@ export function WeddingLayout() {
 
   return (
     <StoreProvider key={weddingId} weddingId={weddingId}>
-      <Shell />
+      <CollabProvider>
+        <CommentLayer>
+          <Shell />
+        </CommentLayer>
+      </CollabProvider>
     </StoreProvider>
   );
 }
@@ -71,7 +80,7 @@ function readCollapsed(): boolean {
 
 function Shell() {
   const { ready, loadError, settings, get } = useStore();
-  const { can, role } = useAuth();
+  const { can, permissions } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const loc = useLocation();
@@ -94,6 +103,9 @@ function Shell() {
     });
 
   const tabs = TABS.filter((t) => can(t.perm));
+  // no permission to change any part of the plan (commenting and chatting don't count)
+  const readOnly = ![...permissions].some((p) => p.endsWith(':write') && !p.startsWith('comments') && !p.startsWith('chat'));
+  const hidden = [!can('finance:read') && 'money', !can('guests:contact') && 'guest contact details'].filter(Boolean) as string[];
   const { venue } = chosenVenue(get('venues'));
   const { days } = countdown(settings.target_date);
   const couple = [settings.couple_a, settings.couple_b].filter(Boolean).join(' & ');
@@ -139,13 +151,19 @@ function Shell() {
               <div className="text-[11px] uppercase tracking-wide text-stone-500">{days >= 0 ? 'days out' : 'married!'}</div>
             </div>
             <WeddingSwitcher />
+            <CommentButtons />
             <ThemeToggle />
             <UserMenu />
           </div>
         </header>
 
-        <main className="mx-auto max-w-7xl px-4 py-6">
-          {role === 'viewer' && <Banner tone="info">You have read-only access to this hub. Money and guest contact details are hidden.</Banner>}
+        <main className="mx-auto max-w-7xl px-4 py-6" data-comment-root>
+          {readOnly && !loc.pathname.endsWith('/chat') && (
+            <Banner tone="info">
+              You have read-only access to this hub{hidden.length ? ` — ${hidden.join(' and ')} ${hidden.length === 1 ? 'is' : 'are'} hidden` : ''}.
+              {can('comments:write') && ' You can still comment and chat.'}
+            </Banner>
+          )}
           {loadError ? (
             <Empty title="The hub couldn't load" body={loadError} action={<Button onClick={() => window.location.reload()}>Try again</Button>} />
           ) : !ready ? (
@@ -155,6 +173,7 @@ function Shell() {
               <Routes>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="account" element={<AccountAndTeam />} />
+                <Route path="chat" element={<Chat />} />
                 <Route path="team" element={<Navigate to="../account" replace />} />
                 <Route path=":tab" element={<TabRoute />} />
               </Routes>
@@ -167,7 +186,8 @@ function Shell() {
         </footer>
       </div>
 
-      {ready && can('assistant:use') && (
+      {/* the chat has its own composer where the assistant's button would sit */}
+      {ready && can('assistant:use') && !loc.pathname.endsWith('/chat') && (
         <Suspense fallback={null}>
           <Assistant />
         </Suspense>
@@ -177,6 +197,8 @@ function Shell() {
 }
 
 function SideNav({ tabs, collapsed, onToggle, onClose }: { tabs: typeof TABS; collapsed: boolean; onToggle?: () => void; onClose?: () => void }) {
+  const { can } = useAuth();
+  const { totalUnread } = useCollab();
   return (
     <>
       <div className={cls('flex h-14 shrink-0 items-center border-b border-stone-100 dark:border-stone-800', collapsed ? 'justify-center px-2' : 'justify-between px-4')}>
@@ -202,6 +224,33 @@ function SideNav({ tabs, collapsed, onToggle, onClose }: { tabs: typeof TABS; co
         )}
       </div>
       <nav aria-label="Modules" className="flex-1 space-y-0.5 overflow-y-auto p-2">
+        {can('chat:read') && (
+          <>
+            <NavLink
+              to="chat"
+              title={collapsed ? `Team chat${totalUnread ? ` (${totalUnread} unread)` : ''}` : undefined}
+              className={({ isActive }) =>
+                cls(
+                  'relative flex items-center rounded-lg text-sm font-medium transition-colors',
+                  collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2',
+                  isActive
+                    ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200'
+                    : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100',
+                )
+              }
+            >
+              <IconChat size={collapsed ? 18 : 16} />
+              {!collapsed && <span className="truncate">Team chat</span>}
+              {collapsed && <span className="sr-only">Team chat</span>}
+              {totalUnread > 0 && (
+                <span className={cls('rounded-full bg-amber-600 px-1.5 text-[10px] font-semibold leading-4 text-white', collapsed ? 'absolute right-1.5 top-1' : 'ml-auto')}>
+                  {totalUnread > 99 ? '99+' : totalUnread}
+                </span>
+              )}
+            </NavLink>
+            <div className="mx-2 my-2 border-t border-stone-100 dark:border-stone-800" />
+          </>
+        )}
         {tabs.map((t) => (
           <NavLink
             key={t.key}
@@ -242,7 +291,7 @@ function NoPermission({ what }: { what: string }) {
     <Empty
       icon={<IconLock size={28} />}
       title={`${what} isn't available to you`}
-      body="Your role on this wedding doesn't include it. If you need it, ask an owner to change your role."
+      body="Your role on this wedding doesn't include it. If you need it, ask an owner to change your role or what it can do."
       action={<Link to="../dashboard"><Button>Back to the dashboard</Button></Link>}
     />
   );
@@ -265,6 +314,45 @@ function WeddingSwitcher() {
         ))}
       </select>
     </label>
+  );
+}
+
+function CommentButtons() {
+  const { commentable, mode, setMode, panel, setPanel, unreadMentions, pageCount } = useCommentUi();
+  return (
+    <div className="flex items-center" data-comment-ui>
+      {commentable && (
+        <button
+          className={cls(
+            'rounded-lg p-2 transition-colors',
+            mode ? 'bg-amber-600 text-white hover:bg-amber-700' : 'text-stone-600 hover:bg-stone-200 dark:text-stone-300 dark:hover:bg-stone-800',
+          )}
+          onClick={() => setMode(!mode)}
+          aria-pressed={mode}
+          aria-label={mode ? 'Stop commenting' : 'Comment on something on this page'}
+          title="Comment mode (C)"
+        >
+          <IconMessagePlus size={18} />
+        </button>
+      )}
+      <button
+        className={cls(
+          'relative rounded-lg p-2 transition-colors',
+          panel ? 'bg-stone-200 text-stone-900 dark:bg-stone-800 dark:text-stone-100' : 'text-stone-600 hover:bg-stone-200 dark:text-stone-300 dark:hover:bg-stone-800',
+        )}
+        onClick={() => setPanel(!panel)}
+        aria-pressed={panel}
+        aria-label={`Comments${unreadMentions ? `, ${unreadMentions} new mentions` : ''}`}
+        title="Comments and mentions"
+      >
+        <IconMessage size={18} />
+        {unreadMentions > 0 ? (
+          <span className="absolute -right-0.5 -top-0.5 min-w-[1.1rem] rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold leading-[1.1rem] text-white">{unreadMentions}</span>
+        ) : pageCount > 0 ? (
+          <span className="absolute -right-0.5 -top-0.5 min-w-[1.1rem] rounded-full bg-stone-500 px-1 text-center text-[10px] font-semibold leading-[1.1rem] text-white">{pageCount}</span>
+        ) : null}
+      </button>
+    </div>
   );
 }
 

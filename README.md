@@ -5,6 +5,10 @@ A shared planning hub for a destination wedding: thirteen linked modules (dashbo
 - **Accounts and roles.** Email magic-link sign-in. Four roles — owner, planner, collaborator, viewer — enforced by Postgres row-level security, not just the UI. Money and guest contact details are the sensitive surfaces.
 - **Multi-tenant.** Every row belongs to one wedding; a person can belong to several with a different role in each.
 - **Dual currency.** Euro spend against a dollar ceiling, side by side.
+- **Editable roles.** Owners can change what each role may see and do, per wedding, from Account & team. The database enforces the edited matrix; owners always keep everything.
+- **Comments and team chat.** Comment mode (the speech-bubble button, or press C) pins a thread to anything on the page, with @mentions. Comments are only visible to people who can open that page. Team chat has channels in categories, threads, pins and unread counts.
+
+Mentions are stored in `public.mentions`, with an `emailed_at` column ready for the email notifications that come next. A notification can link to `/w/<wedding>/<page>?comment=<id>` to open the thread, or to `/w/<wedding>/chat?channel=<id>&message=<id>` for a chat message.
 
 Stack: React 18 + TypeScript + Vite + Tailwind, React Router, Supabase (Postgres, Auth, Realtime, Storage, Edge Functions). Claude powers the assistant and email autofill, server-side only.
 

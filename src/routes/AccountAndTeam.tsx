@@ -1,8 +1,10 @@
 // Account and team on one page (inside a wedding): your profile, your weddings, sign-out,
-// then the team for this wedding — editable for owners, read-only for everyone else.
+// then the team for this wedding and what each role can do — editable for owners,
+// read-only for everyone else.
 import { SectionTitle } from '@/components/kit';
 import { AccountSections } from './Account';
 import { Team } from './Team';
+import { RolePermissions } from './RolePermissions';
 
 export function AccountAndTeam() {
   return (
@@ -10,6 +12,7 @@ export function AccountAndTeam() {
       <SectionTitle sub="Your profile and sign-in, and who else is planning this wedding with you.">Account &amp; team</SectionTitle>
       <AccountSections wide />
       <Team />
+      <RolePermissions />
     </div>
   );
 }

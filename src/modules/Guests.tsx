@@ -178,7 +178,7 @@ export default function Guests() {
             </thead>
             <tbody>
               {filtered.map((g) => (
-                <TR key={g.id} onClick={() => openGuest(g)}>
+                <TR key={g.id} commentKey={g.id} onClick={() => openGuest(g)}>
                   <TD className="font-medium">{guestName(g)} {g.is_child && <Pill tone="muted">child</Pill>}</TD>
                   <TD>{g.household}</TD>
                   <TD>{SIDE_LABEL[g.side]}</TD>

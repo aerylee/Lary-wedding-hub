@@ -124,7 +124,7 @@ export default function Vendors() {
               {filtered.map((v) => {
                 const f = finBy.get(v.id);
                 return (
-                  <TR key={v.id} onClick={() => open(v)}>
+                  <TR key={v.id} commentKey={v.id} onClick={() => open(v)}>
                     <TD className="font-medium">{v.name}</TD>
                     <TD>{v.category}</TD>
                     <TD><StatusPill value={v.status} tones={STATUS_TONE} labels={STATUS_LABEL} /></TD>
@@ -191,7 +191,7 @@ export default function Vendors() {
                   <Field label="Deposit due"><Input type="date" value={ed.draft._deposit_due ?? ''} onChange={(e) => ed.set('_deposit_due', e.target.value || null)} /></Field>
                   <Field label="Balance due"><Input type="date" value={ed.draft._balance_due ?? ''} onChange={(e) => ed.set('_balance_due', e.target.value || null)} /></Field>
                 </Grid>
-                <p className="mt-2 text-xs text-stone-500">Only owners and planners see this. Add the payments themselves on the Budget page.</p>
+                <p className="mt-2 text-xs text-stone-500">Only people who can see the budget see this. Add the payments themselves on the Budget page.</p>
               </fieldset>
             </Can>
             {!ed.isNew && <p className="text-xs text-stone-500"><Pill tone="muted">tip</Pill> Budget lines and payments can link to this vendor.</p>}

@@ -1,4 +1,4 @@
-import { addDays, csvObjects, daysBetween, dayOfWeek, isMidweek, parseCSV, parseDate, toCSV } from './util';
+import { addDays, csvObjects, monthGrid, daysBetween, dayOfWeek, isMidweek, parseCSV, parseDate, toCSV } from './util';
 
 describe('dates', () => {
   it('parses date-only values at local noon', () => {
@@ -35,5 +35,16 @@ describe('CSV', () => {
   });
   it('maps rows to lower-cased headers and skips blank lines', () => {
     expect(csvObjects('First Name,Email\r\nAnne,a@x.test\r\n\r\n')).toEqual([{ 'first name': 'Anne', email: 'a@x.test' }]);
+  });
+});
+
+describe('monthGrid', () => {
+  it('covers the month in whole Sunday-first weeks', () => {
+    const g = monthGrid(2027, 5); // June 2027 starts on a Tuesday
+    expect(g[0][0]).toBe('2027-05-30');
+    expect(g[0][2]).toBe('2027-06-01');
+    expect(g.flat()).toContain('2027-06-30');
+    expect(g.every((w) => w.length === 7)).toBe(true);
+    expect(g.length).toBe(5);
   });
 });

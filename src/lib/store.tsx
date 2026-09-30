@@ -15,6 +15,7 @@ import {
   COLL_LABEL, READ_PERM, type ActivityEntry, type AppRole, type Attachment, type CollMap, type CollName,
   type Invitation, type Membership, type Profile, type Row, type WeddingSettings,
 } from './types';
+import { effectiveMatrix, type Matrix, type Override } from './permissions';
 
 // Dynamic table names defeat the generated types; the view-model types take over at the edge.
 const db = supabase as unknown as SupabaseClient;
@@ -76,7 +77,15 @@ export type StoreValue = {
     removeMember: (membershipId: string) => Promise<void>;
   };
   invoke: <T = unknown>(fn: string, body: Record<string, unknown>) => Promise<T>;
+  /** what each role can do on this wedding: the defaults, and with this wedding's overrides */
+  roles: {
+    defaults: Matrix;
+    matrix: Matrix;
+    save: (changes: Override[]) => Promise<void>;
+  };
 };
+
+const emptyMatrix = (): Matrix => ({ owner: new Set(), planner: new Set(), collaborator: new Set(), viewer: new Set() });
 
 const emptyData = (): Data => Object.fromEntries(COLLECTIONS.map((c) => [c, []])) as unknown as Data;
 
@@ -131,6 +140,8 @@ export function StoreProvider({ weddingId, children }: { weddingId: string; chil
   const [error, setError] = useState<string | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
+  const [roleDefaults, setRoleDefaults] = useState<{ role: AppRole; permission: string }[]>([]);
+  const [roleOverrides, setRoleOverrides] = useState<Override[]>([]);
 
   const dataRef = useRef(data);
   dataRef.current = data;
@@ -147,6 +158,28 @@ export function StoreProvider({ weddingId, children }: { weddingId: string; chil
       .order('created_at');
     setMembers((rows ?? []) as Member[]);
   }, [weddingId]);
+
+  const reloadRoles = useCallback(async () => {
+    const [d, o] = await Promise.all([
+      db.from('role_permissions').select('role, permission'),
+      db.from('wedding_role_permissions').select('role, permission, granted').eq('wedding_id', weddingId),
+    ]);
+    if (d.data) setRoleDefaults(d.data as { role: AppRole; permission: string }[]);
+    if (o.data) setRoleOverrides(o.data as Override[]);
+  }, [weddingId]);
+
+  useEffect(() => {
+    reloadRoles();
+    const ch = supabase
+      .channel(`roles:${weddingId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wedding_role_permissions', filter: `wedding_id=eq.${weddingId}` }, () => {
+        reloadRoles();
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [weddingId, reloadRoles]);
 
   // ─── load + subscribe ────────────────────────────────────────────────────
   useEffect(() => {
@@ -438,6 +471,20 @@ export function StoreProvider({ weddingId, children }: { weddingId: string; chil
     return out as T;
   }, [weddingId]);
 
+  const roles = useMemo<StoreValue['roles']>(() => {
+    const defaults = roleDefaults.length ? effectiveMatrix(roleDefaults, []) : emptyMatrix();
+    return {
+      defaults,
+      matrix: roleDefaults.length ? effectiveMatrix(roleDefaults, roleOverrides) : emptyMatrix(),
+      save: async (changes) => {
+        if (!changes.length) return;
+        const { error: err } = await supabase.rpc('set_role_permissions', { w: weddingId, changes });
+        if (err) fail(err.code === '42501' ? 'Only owners can change what each role can do.' : `Couldn't save the permissions: ${err.message}`);
+        await reloadRoles();
+      },
+    };
+  }, [roleDefaults, roleOverrides, weddingId, fail, reloadRoles]);
+
   const value = useMemo<StoreValue>(
     () => ({
       ready,
@@ -457,8 +504,9 @@ export function StoreProvider({ weddingId, children }: { weddingId: string; chil
       files,
       team,
       invoke,
+      roles,
     }),
-    [ready, loadError, weddingId, settings, saveSettings, data, put, putMany, remove, error, members, activity, reloadMembers, files, team, invoke],
+    [ready, loadError, weddingId, settings, saveSettings, data, put, putMany, remove, error, members, activity, reloadMembers, files, team, invoke, roles],
   );
 
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;

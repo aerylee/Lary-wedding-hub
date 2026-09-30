@@ -265,7 +265,7 @@ function VendorLog() {
               {shown.map((c) => {
                 const d = daysUntil(c.follow_up_by);
                 return (
-                  <TR key={c.id} onClick={() => ed.open(c)}>
+                  <TR key={c.id} commentKey={c.id} onClick={() => ed.open(c)}>
                     <TD className="whitespace-nowrap">{fmtDate(c.date, { year: false })}<div className="text-xs text-stone-500">{c.direction === 'sent' ? '→ sent' : '← received'} · {c.channel}</div></TD>
                     <TD>{vendorName(c.vendor_id)}</TD>
                     <TD><div className="font-medium">{c.subject || '(no subject)'}</div><div className="line-clamp-2 text-xs text-stone-500">{c.summary}</div></TD>

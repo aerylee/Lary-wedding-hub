@@ -1,7 +1,7 @@
 import type { BudgetLine, Guest, LegalDoc, Rsvp, ScheduleItem, Task, Venue, WeddingEvent } from './types';
 import {
   budgetTotals, categoryTotals, chosenVenue, lineEur, planningHeadcount, rsvpSummary, scenarioTotal,
-  scheduleClashes, taskDue, taskState, validityWarnings, venueScore, fillTemplate,
+  scheduleClashes, taskDue, taskState, validityWarnings, venueScore, fillTemplate, rescheduled,
 } from './derive';
 
 const line = (p: Partial<BudgetLine>): BudgetLine => ({
@@ -131,5 +131,17 @@ describe('templates', () => {
   it('fills known tokens and leaves unknown braces alone', () => {
     const t = { couple: 'R & L', date: 'D', venue: 'V', guests: '60', household: 'H', rsvpBy: 'R', website: 'W' };
     expect(fillTemplate('{couple} at {venue} — {unknown}', t)).toBe('R & L at V — {unknown}');
+  });
+});
+
+describe('rescheduled', () => {
+  const base = { offset_days: 100, due_override: null } as unknown as Parameters<typeof rescheduled>[0];
+  it('keeps a relative task relative to the wedding', () => {
+    expect(rescheduled(base, '2027-06-01', '2027-06-19').offset_days).toBe(18);
+    expect(rescheduled(base, '2027-06-01', '2027-06-19').due_override).toBeNull();
+  });
+  it('moves a fixed-date task to the new date', () => {
+    const fixed = { ...base, due_override: '2027-01-01' };
+    expect(rescheduled(fixed, '2027-02-02', '2027-06-19')).toMatchObject({ due_override: '2027-02-02', offset_days: 100 });
   });
 });

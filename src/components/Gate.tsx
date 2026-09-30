@@ -10,18 +10,22 @@ export function Can({ perm, children, fallback = null }: { perm: Permission; chi
   return <>{can(perm) ? children : fallback}</>;
 }
 
+// Roles are editable per wedding, so the reasons talk about "your role", not role names.
 const WHY: Partial<Record<Permission, string>> = {
-  'finance:write': 'Only owners and planners can change money.',
-  'finance:read': 'Only owners and planners can see money.',
-  'settings:write': 'Only owners and planners can change the wedding settings.',
-  'vendors:write': 'Only owners and planners can change vendors.',
+  'finance:write': 'Your role can’t change money on this wedding.',
+  'finance:read': 'Your role can’t see money on this wedding.',
+  'settings:write': 'Your role can’t change the wedding settings.',
+  'vendors:write': 'Your role can’t change vendors.',
   'members:manage': 'Only owners can manage the team.',
-  'assistant:apply': 'Only owners and planners can apply the assistant’s changes.',
-  'guests:contact': 'You can’t see guest contact details.',
+  'assistant:apply': 'Your role can’t apply the assistant’s changes.',
+  'guests:contact': 'Your role can’t see guest contact details.',
+  'comments:write': 'Your role can’t comment on this wedding.',
+  'chat:write': 'Your role can read the chat but not post.',
+  'chat:manage': 'Your role can’t create or organise channels.',
 };
 
 export function whyNot(perm: Permission): string {
-  return WHY[perm] ?? 'You have read-only access to this.';
+  return WHY[perm] ?? 'Your role has read-only access to this.';
 }
 
 /** Disabled with a tooltip explaining why — hiding a control makes the app feel broken. */

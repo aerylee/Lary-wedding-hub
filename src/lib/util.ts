@@ -42,6 +42,15 @@ export function daysUntil(iso: string | null | undefined, now: Date = new Date()
   return daysBetween(todayISO(now), iso);
 }
 
+/** Six-or-fewer weeks of ISO dates covering a month, Sunday first. */
+export function monthGrid(year: number, month: number): string[][] {
+  const first = new Date(year, month, 1, 12);
+  const start = addDays(toISODate(first), -first.getDay());
+  const last = new Date(year, month + 1, 0, 12);
+  const weeks = Math.ceil((first.getDay() + last.getDate()) / 7);
+  return Array.from({ length: weeks }, (_, w) => Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)));
+}
+
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export function dayOfWeek(iso: string | null | undefined): string {

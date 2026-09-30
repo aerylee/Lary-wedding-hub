@@ -142,6 +142,11 @@ export function taskState(task: Task, targetDate: string, today = todayISO()): T
   return { due, days, done, overdue: !done && days < 0, soon: !done && days >= 0 && days <= 30 };
 }
 
+/** The task after moving it to `date`: a fixed date stays fixed; a relative one stays relative. */
+export function rescheduled(t: Task, date: string, targetDate: string): Task {
+  return t.due_override ? { ...t, due_override: date } : { ...t, offset_days: daysBetween(date, targetDate) };
+}
+
 export type TaskSummary = { done: number; overdue: number; soon: number; open: number; total: number; pct: number };
 
 export function taskSummary(tasks: Task[], targetDate: string, today = todayISO()): TaskSummary {

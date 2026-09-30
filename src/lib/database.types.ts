@@ -349,6 +349,297 @@ export type Database = {
           },
         ]
       }
+      chat_categories: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          position: number
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          position?: number
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          position?: number
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_categories_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_categories_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_channels: {
+        Row: {
+          archived_at: string | null
+          category_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          position: number
+          topic: string
+          wedding_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          position?: number
+          topic?: string
+          wedding_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          position?: number
+          topic?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_channels_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_channels_wedding_id_category_id_fkey"
+            columns: ["wedding_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "chat_categories"
+            referencedColumns: ["wedding_id", "id"]
+          },
+          {
+            foreignKeyName: "chat_channels_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          author_id: string | null
+          body: string
+          channel_id: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          mentions: string[]
+          parent_id: string | null
+          pinned: boolean
+          wedding_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          channel_id: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          mentions?: string[]
+          parent_id?: string | null
+          pinned?: boolean
+          wedding_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          channel_id?: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          mentions?: string[]
+          parent_id?: string | null
+          pinned?: boolean
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_wedding_id_channel_id_fkey"
+            columns: ["wedding_id", "channel_id"]
+            isOneToOne: false
+            referencedRelation: "chat_channels"
+            referencedColumns: ["wedding_id", "id"]
+          },
+          {
+            foreignKeyName: "chat_messages_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_wedding_id_parent_id_fkey"
+            columns: ["wedding_id", "parent_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["wedding_id", "id"]
+          },
+        ]
+      }
+      chat_reads: {
+        Row: {
+          channel_id: string
+          last_read_at: string
+          user_id: string
+          wedding_id: string
+        }
+        Insert: {
+          channel_id: string
+          last_read_at?: string
+          user_id?: string
+          wedding_id: string
+        }
+        Update: {
+          channel_id?: string
+          last_read_at?: string
+          user_id?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_reads_wedding_id_channel_id_fkey"
+            columns: ["wedding_id", "channel_id"]
+            isOneToOne: false
+            referencedRelation: "chat_channels"
+            referencedColumns: ["wedding_id", "id"]
+          },
+          {
+            foreignKeyName: "chat_reads_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          anchor: Json
+          anchor_label: string
+          author_id: string | null
+          body: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          mentions: string[]
+          page: string
+          parent_id: string | null
+          read_perms: string[]
+          resolved_at: string | null
+          resolved_by: string | null
+          wedding_id: string
+        }
+        Insert: {
+          anchor?: Json
+          anchor_label?: string
+          author_id?: string | null
+          body: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          mentions?: string[]
+          page: string
+          parent_id?: string | null
+          read_perms?: string[]
+          resolved_at?: string | null
+          resolved_by?: string | null
+          wedding_id: string
+        }
+        Update: {
+          anchor?: Json
+          anchor_label?: string
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          mentions?: string[]
+          page?: string
+          parent_id?: string | null
+          read_perms?: string[]
+          resolved_at?: string | null
+          resolved_by?: string | null
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_wedding_id_parent_id_fkey"
+            columns: ["wedding_id", "parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["wedding_id", "id"]
+          },
+        ]
+      }
       comms_rows: {
         Row: {
           channel: string
@@ -1117,6 +1408,87 @@ export type Database = {
           },
           {
             foreignKeyName: "memberships_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentions: {
+        Row: {
+          author_id: string | null
+          channel_id: string | null
+          comment_id: string | null
+          created_at: string
+          emailed_at: string | null
+          excerpt: string
+          id: string
+          message_id: string | null
+          page: string | null
+          read_at: string | null
+          user_id: string
+          wedding_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          channel_id?: string | null
+          comment_id?: string | null
+          created_at?: string
+          emailed_at?: string | null
+          excerpt?: string
+          id?: string
+          message_id?: string | null
+          page?: string | null
+          read_at?: string | null
+          user_id: string
+          wedding_id: string
+        }
+        Update: {
+          author_id?: string | null
+          channel_id?: string | null
+          comment_id?: string | null
+          created_at?: string
+          emailed_at?: string | null
+          excerpt?: string
+          id?: string
+          message_id?: string | null
+          page?: string | null
+          read_at?: string | null
+          user_id?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentions_wedding_id_fkey"
             columns: ["wedding_id"]
             isOneToOne: false
             referencedRelation: "weddings"
@@ -1981,6 +2353,48 @@ export type Database = {
           },
         ]
       }
+      wedding_role_permissions: {
+        Row: {
+          granted: boolean
+          permission: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          updated_by: string | null
+          wedding_id: string
+        }
+        Insert: {
+          granted: boolean
+          permission: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          updated_by?: string | null
+          wedding_id: string
+        }
+        Update: {
+          granted?: boolean
+          permission?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          updated_by?: string | null
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wedding_role_permissions_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wedding_role_permissions_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wedding_settings: {
         Row: {
           candidate_countries: string[]
@@ -2164,6 +2578,10 @@ export type Database = {
       }
       revoke_invitation: { Args: { p_id: string }; Returns: undefined }
       seed_wedding: { Args: { w: string }; Returns: undefined }
+      set_role_permissions: {
+        Args: { changes: Json; w: string }
+        Returns: undefined
+      }
       touch_last_seen: { Args: never; Returns: undefined }
     }
     Enums: {

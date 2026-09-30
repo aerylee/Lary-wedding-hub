@@ -374,9 +374,10 @@ export function TD({ children, className, align, colSpan, onClick }: { children?
   );
 }
 
-export function TR({ children, onClick, className }: { children: ReactNode; onClick?: () => void; className?: string }) {
+export function TR({ children, onClick, className, commentKey }: { children: ReactNode; onClick?: () => void; className?: string; commentKey?: string }) {
   return (
     <tr
+      data-comment-key={commentKey}
       onClick={onClick}
       onKeyDown={onClick ? (e) => (e.key === 'Enter' ? onClick() : undefined) : undefined}
       tabIndex={onClick ? 0 : undefined}

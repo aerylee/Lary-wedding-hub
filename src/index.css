@@ -9,3 +9,9 @@
   input[type='date'], input[type='time'] { min-height: 2.375rem; }
   .dark { color-scheme: dark; }
 }
+
+/* comment mode: everything in the page becomes something you can pin a comment to */
+[data-comment-mode] [data-comment-root],
+[data-comment-mode] [data-comment-root] * {
+  cursor: crosshair !important;
+}
